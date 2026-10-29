@@ -1,0 +1,4068 @@
+/*! yf — Yoan Faure's design system. MIT licence. https://ds.yoanfaure.com */
+
+/* Cascade order. Everything yf ships lives in a layer, so any unlayered app CSS
+   wins without specificity fights. */
+@layer yf.reset, yf.tokens, yf.base, yf.layout, yf.components, yf.utilities;
+/* Tokens: the only place raw values live. Components read these and nothing else.
+   Light is the base. Dark applies when the system asks for it and no explicit
+   light theme is set, or when html[data-theme="dark"] forces it. */
+
+@layer yf.tokens {
+  @font-face {
+    font-family: "Inter";
+    src: url("fonts/InterVariable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Inter";
+    src: url("fonts/InterVariable-Italic.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    /* colour: ink on paper */
+    --yf-bg: #f4efe4;
+    --yf-fg: #262523;
+    --yf-muted: #6b675f;
+    --yf-rule: #ddd6c8;
+    --yf-sunk: #ece6d8;
+
+    /* colour: status only, never decoration or brand */
+    --yf-danger: #a12c1b;
+    --yf-danger-bg: #f1d9cf;
+    --yf-warning: #855700;
+    --yf-warning-bg: #efdfba;
+    --yf-success: #3d6b2a;
+    --yf-success-bg: #dbe5cc;
+
+    /* colour: interaction (ink, inverted) */
+    --yf-primary: var(--yf-fg);
+    --yf-on-primary: var(--yf-bg);
+    --yf-focus: var(--yf-fg);
+    --yf-hover: color-mix(in srgb, var(--yf-fg) 6%, transparent);
+    --yf-selected: color-mix(in srgb, var(--yf-fg) 11%, transparent);
+
+    /* colour: chart series, ink shades, each paired with a dash pattern. The
+       lightest stays above 3:1 against paper in both themes (52% is about 3.15:1
+       in light), so the patterns carry the rest of the difference. */
+    --yf-series-1: var(--yf-fg);
+    --yf-series-2: color-mix(in srgb, var(--yf-fg) 78%, var(--yf-bg));
+    --yf-series-3: color-mix(in srgb, var(--yf-fg) 62%, var(--yf-bg));
+    --yf-series-4: color-mix(in srgb, var(--yf-fg) 52%, var(--yf-bg));
+    --yf-dash-1: none;
+    --yf-dash-2: 6 3;
+    --yf-dash-3: 1.5 3;
+    --yf-dash-4: 8 3 1.5 3;
+
+    /* type */
+    --yf-font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --yf-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --yf-text-xs: 0.75rem;
+    --yf-text-sm: 0.875rem;
+    --yf-text-base: 1rem;
+    --yf-text-lg: 1.125rem;
+    --yf-text-xl: 1.375rem;
+    --yf-text-2xl: 1.75rem;
+    --yf-text-3xl: clamp(1.875rem, 1.3rem + 2.2vw, 2.5rem);
+    --yf-leading-tight: 1.15;
+    --yf-leading-normal: 1.6;
+    --yf-leading-prose: 1.7;
+    --yf-weight-regular: 400;
+    --yf-weight-medium: 600;
+    --yf-weight-bold: 700;
+    --yf-tracking-tight: -0.02em;
+    --yf-tracking-display: -0.03em;
+
+    /* space: one scale for gaps and padding */
+    --yf-space-1: 0.25rem;
+    --yf-space-2: 0.5rem;
+    --yf-space-3: 0.75rem;
+    --yf-space-4: 1rem;
+    --yf-space-5: 1.5rem;
+    --yf-space-6: 2rem;
+    --yf-space-7: 3rem;
+    --yf-space-8: 4rem;
+
+    /* shape: square layout, 3px on controls */
+    --yf-radius: 3px;
+    --yf-radius-layout: 0;
+    --yf-border: 1px solid var(--yf-rule);
+    --yf-border-strong: 1px solid var(--yf-fg);
+    /* the edge of an input or other control: 3:1 against paper in both themes
+       (the rule colour alone is a divider, too faint to outline a control) */
+    --yf-control-border: color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg));
+
+    /* sizes */
+    --yf-control-h: 2.25rem;
+    --yf-control-h-sm: 1.75rem;
+    --yf-measure: 38rem;
+    --yf-container: 72rem;
+    --yf-gutter: clamp(1rem, 4vw, 2.5rem);
+
+    /* overlays (dialog, menu, toast) are the only things that cast a shadow */
+    --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.08);
+
+    /* motion */
+    --yf-dur-fast: 120ms;
+    --yf-dur: 200ms;
+    --yf-dur-slow: 400ms;
+    --yf-ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --yf-ease-in: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+    /* stacking */
+    --yf-z-sticky: 20;
+    --yf-z-dropdown: 30;
+    --yf-z-overlay: 40;
+    --yf-z-toast: 50;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --yf-bg: #1e1d1b;
+      --yf-fg: #ece6d9;
+      --yf-muted: #9a958b;
+      --yf-rule: #34322f;
+      --yf-sunk: #262522;
+      --yf-danger: #ec8a74;
+      --yf-danger-bg: #3b2420;
+      --yf-warning: #dcab4f;
+      --yf-warning-bg: #3a2f1b;
+      --yf-success: #98c27c;
+      --yf-success-bg: #263221;
+      --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --yf-bg: #1e1d1b;
+    --yf-fg: #ece6d9;
+    --yf-muted: #9a958b;
+    --yf-rule: #34322f;
+    --yf-sunk: #262522;
+    --yf-danger: #ec8a74;
+    --yf-danger-bg: #3b2420;
+    --yf-warning: #dcab4f;
+    --yf-warning-bg: #3a2f1b;
+    --yf-success: #98c27c;
+    --yf-success-bg: #263221;
+    --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+}
+/* Reset: small and modern. Box model, zero margins (spacing comes from gap in
+   .yf-stack and friends), media defaults, form font inheritance, [hidden]. */
+
+@layer yf.reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* dialog and popover centre themselves with `margin: auto`; leave that alone */
+  *:not(dialog, [popover]) {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  img,
+  picture,
+  video,
+  canvas {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  img,
+  video {
+    block-size: auto;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* A fieldset is as wide as its content by default, and a field would not shrink in a
+     flex row. Set here, under the layout layer, so a .yf-split side still keeps its half. */
+  fieldset,
+  .yf-field {
+    min-inline-size: 0;
+  }
+
+  /* !important, so no display rule in a later layer can bring a hidden element back */
+  [hidden]:not([hidden="until-found"]) {
+    display: none !important;
+  }
+}
+/* Base: the page, links, focus, selection, headings, code. Same voice as
+   yoanfaure.com: Inter on paper, links underlined and inverted on hover. */
+
+@layer yf.base {
+  html {
+    /* paper on the root too, so a view transition never starts from the browser's white */
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    font-size: 100%; /* 16px, unless the reader chose another size */
+    tab-size: 2;
+  }
+
+  body {
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-base);
+    font-weight: var(--yf-weight-regular);
+    line-height: var(--yf-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  /* ---------- links ---------- */
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  a:not([href]) {
+    text-decoration: none;
+  }
+
+  a[href]:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  @media (any-hover: hover) {
+    a[href]:hover {
+      background: var(--yf-fg);
+      color: var(--yf-bg);
+    }
+  }
+
+  /* ---------- focus ---------- */
+
+  :focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  /* ---------- headings ---------- */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: var(--yf-leading-tight);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--yf-text-3xl);
+    letter-spacing: var(--yf-tracking-display);
+  }
+
+  h2 {
+    font-size: var(--yf-text-2xl);
+  }
+
+  h3 {
+    font-size: var(--yf-text-xl);
+  }
+
+  h4 {
+    font-size: var(--yf-text-lg);
+  }
+
+  h5 {
+    font-size: var(--yf-text-base);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  h6 {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  strong,
+  b {
+    font-weight: var(--yf-weight-medium);
+  }
+
+  small {
+    font-size: var(--yf-text-sm);
+  }
+
+  mark {
+    background: var(--yf-selected);
+    color: inherit;
+  }
+
+  /* ---------- code ---------- */
+
+  /* One weight of mono ships, so nothing is faked. */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--yf-font-mono);
+    font-weight: var(--yf-weight-regular);
+    font-style: normal;
+    font-synthesis-weight: none;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+  }
+
+  code,
+  kbd,
+  samp {
+    font-size: 0.875em;
+  }
+
+  :not(pre) > code {
+    padding: 0.12em 0.35em;
+    background: var(--yf-rule);
+  }
+
+  kbd {
+    padding: 0.1em 0.4em;
+    border: var(--yf-border);
+    border-radius: var(--yf-radius);
+    background: var(--yf-sunk);
+  }
+
+  pre {
+    padding: var(--yf-space-4) var(--yf-space-5);
+    overflow-x: auto;
+    border: var(--yf-border);
+    font-size: var(--yf-text-sm);
+    line-height: var(--yf-leading-normal);
+  }
+
+  /* ---------- rules ---------- */
+
+  hr {
+    block-size: 0;
+    border: 0;
+    border-block-start: var(--yf-border);
+    color: var(--yf-rule);
+  }
+
+  /* ---------- view transitions ---------- */
+
+  /* paper under every transition (the theme switch too), never the canvas white */
+  ::view-transition {
+    background: var(--yf-bg);
+  }
+
+  /* the theme switch is one soft cross-fade */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:active-view-transition-type(theme)::view-transition-group(*) {
+      animation-duration: var(--yf-dur);
+      animation-timing-function: var(--yf-ease-out);
+    }
+  }
+}
+/* Type utilities. Sizes come from the scale; headings keep their semantic size
+   unless one of these says otherwise. */
+
+@layer yf.utilities {
+  .yf-text-xs {
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-text-sm {
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-text-base {
+    font-size: var(--yf-text-base);
+  }
+
+  .yf-text-lg {
+    font-size: var(--yf-text-lg);
+  }
+
+  .yf-text-xl {
+    font-size: var(--yf-text-xl);
+    letter-spacing: var(--yf-tracking-tight);
+  }
+
+  .yf-text-2xl {
+    font-size: var(--yf-text-2xl);
+    line-height: var(--yf-leading-tight);
+    letter-spacing: var(--yf-tracking-tight);
+  }
+
+  .yf-text-3xl {
+    font-size: var(--yf-text-3xl);
+    line-height: var(--yf-leading-tight);
+    letter-spacing: var(--yf-tracking-display);
+  }
+
+  /* ids, hashes, code, numbers in tables */
+  .yf-mono {
+    font-family: var(--yf-font-mono);
+    font-weight: var(--yf-weight-regular);
+    font-synthesis-weight: none;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+  }
+
+  .yf-muted {
+    color: var(--yf-muted);
+  }
+
+  /* figures that line up in columns */
+  .yf-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-bold {
+    font-weight: var(--yf-weight-bold);
+  }
+
+  /* A small muted label above a section, as the log's heading on yoanfaure.com:
+     sentence case at 600, not shouted in capitals. */
+  .yf-eyebrow {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: 0;
+  }
+
+  /* One line with an ellipsis. Needs a width: a block, a flex item with min-width 0, or a fixed table cell. */
+  .yf-truncate {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* off screen, still read by screen readers */
+  .yf-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* Layout: boxes that place things. Spacing is always gap, never a margin between
+   siblings. Each primitive has a custom property for the one-off case, and presets for the
+   usual ones, since a strict CSP forbids setting a property in a style attribute. */
+
+/* registered, so the scroller's edge fade can animate them */
+@property --yf-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --yf-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@layer yf.layout {
+  /* ---------- page, container, column ----------
+     .yf-page       the room above and below a page's content; put it on the outer wrapper.
+     .yf-container  the app width, gutters on both sides (--yf-container sets the max).
+                    --narrow is 52rem, --wide 88rem (a table with many columns).
+     .yf-column     the reading measure, centred. Inside a container it needs no gutter. */
+
+  .yf-page {
+    padding-block: var(--yf-space-6) var(--yf-space-7);
+  }
+
+  .yf-container {
+    inline-size: min(100% - 2 * var(--yf-gutter), var(--yf-container, 72rem));
+    margin-inline: auto;
+  }
+
+  .yf-container--narrow {
+    --yf-container: 52rem;
+  }
+
+  .yf-container--wide {
+    --yf-container: 88rem;
+  }
+
+  .yf-column {
+    inline-size: min(100% - 2 * var(--yf-gutter), var(--yf-measure));
+    margin-inline: auto;
+  }
+
+  .yf-container .yf-column {
+    inline-size: min(100%, var(--yf-measure));
+  }
+
+  /* ---------- stack ----------
+     Children in a column, a gap between them. --yf-stack-gap overrides the gap.
+     A grid with one shrinkable track, so a wide table or <pre> scrolls
+     instead of pushing the stack wider than its parent. */
+
+  .yf-stack {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--yf-stack-gap, var(--yf-space-4));
+  }
+
+  .yf-stack--sm {
+    gap: var(--yf-space-2);
+  }
+
+  .yf-stack--lg {
+    gap: var(--yf-space-5);
+  }
+
+  .yf-stack--xl {
+    gap: var(--yf-space-7);
+  }
+
+  /* ---------- cluster ----------
+     Inline items that wrap: buttons, pills, tags, a toolbar. --yf-cluster-gap overrides the gap. */
+
+  .yf-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--yf-cluster-gap, var(--yf-space-3));
+  }
+
+  .yf-cluster--sm {
+    gap: var(--yf-space-2);
+  }
+
+  .yf-cluster--lg {
+    gap: var(--yf-space-5);
+  }
+
+  .yf-cluster--between {
+    justify-content: space-between;
+  }
+
+  .yf-cluster--end {
+    justify-content: flex-end;
+  }
+
+  .yf-cluster--start {
+    align-items: flex-start;
+  }
+
+  /* ---------- scroller ----------
+     One row that scrolls sideways instead of wrapping: chips on a phone, a long toolbar.
+     The scrollbar is hidden, so the edge with more to show fades out (where the browser
+     has scroll-driven animations; elsewhere the row just scrolls). Tab lists and the
+     stats row on a phone do the same. --yf-scroller-gap overrides the gap. */
+
+  .yf-scroller {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-scroller-gap, var(--yf-space-2));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .yf-scroller > * {
+    flex: none;
+  }
+
+  .yf-scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .yf-scroller {
+      mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      animation: yf-edge-fade linear both;
+      animation-timeline: scroll(self inline);
+    }
+
+    .yf-scroller:dir(rtl) {
+      mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+    }
+  }
+
+  /* an inactive timeline (nothing to scroll) leaves both at 0: no fade */
+  @keyframes yf-edge-fade {
+    0% {
+      --yf-fade-start: 0px;
+      --yf-fade-end: 1.5rem;
+    }
+
+    8%,
+    92% {
+      --yf-fade-start: 1.5rem;
+      --yf-fade-end: 1.5rem;
+    }
+
+    100% {
+      --yf-fade-start: 1.5rem;
+      --yf-fade-end: 0px;
+    }
+  }
+
+  /* ---------- grid ----------
+     As many columns as fit, none narrower than --yf-grid-min, sharing the width.
+     min() keeps one column from overflowing a narrow container. */
+
+  .yf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--yf-grid-min, 16rem), 100%), 1fr));
+    gap: var(--yf-grid-gap, var(--yf-space-5));
+  }
+
+  .yf-grid--sm {
+    --yf-grid-min: 10rem;
+  }
+
+  .yf-grid--lg {
+    --yf-grid-min: 24rem;
+  }
+
+  /* ---------- split ----------
+     Sidebar first, main second. They sit side by side while main keeps at least
+     half the width, and stack when it cannot. It reacts to its own width, not the
+     screen's, so it works inside a narrow panel too. --yf-split-side is the sidebar's width
+     (15rem); .yf-split--wide-side makes it 20rem. .yf-split--end puts the sidebar last. */
+
+  .yf-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-split-gap, var(--yf-space-6));
+  }
+
+  .yf-split > :first-child {
+    flex: 1 1 var(--yf-split-side, 15rem);
+  }
+
+  .yf-split > :last-child {
+    flex: 999 1 0;
+    min-inline-size: 50%;
+  }
+
+  .yf-split--wide-side {
+    --yf-split-side: 20rem;
+  }
+
+  .yf-split--end > :first-child {
+    flex: 999 1 0;
+    min-inline-size: 50%;
+  }
+
+  .yf-split--end > :last-child {
+    flex: 1 1 var(--yf-split-side, 15rem);
+    min-inline-size: 0;
+  }
+
+  /* ---------- divider ---------- */
+
+  .yf-divider {
+    block-size: 0;
+    border: 0;
+    border-block-start: var(--yf-border);
+  }
+
+  .yf-divider--strong {
+    border-block-start: var(--yf-border-strong);
+  }
+
+  .yf-divider--vertical {
+    inline-size: 0;
+    block-size: auto;
+    align-self: stretch;
+    border-block-start: 0;
+    border-inline-start: var(--yf-border);
+  }
+
+  /* ---------- skip link ----------
+     First focusable thing on the page; shows when it has focus. */
+
+  .yf-skip-link:not(:focus) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .yf-skip-link {
+    position: fixed;
+    inset-block-start: var(--yf-space-3);
+    inset-inline-start: var(--yf-gutter);
+    z-index: var(--yf-z-toast);
+    padding: var(--yf-space-1) var(--yf-space-3);
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+}
+/* Actions: button (primary, secondary, ghost, danger, icon), button group, link.
+   Variants only set a few private properties (--_bg, --_fg, --_bd and their hover
+   twins); states and sizing are written once. */
+
+@layer yf.components {
+  /* ---------- button ----------
+     <button class="yf-button">Cancel</button>                       secondary: 1px ink outline
+     <button class="yf-button yf-button--primary">Save</button>      solid ink; one per view
+     <button class="yf-button yf-button--ghost">Skip</button>        no border; fills on hover
+     <button class="yf-button yf-button--danger">Delete</button>     danger outline; fills on hover
+     <button class="yf-button yf-button--icon" aria-label="Copy">    square, icon only
+     <button class="yf-button yf-button--ghost yf-button--close" aria-label="Close"></button>
+     <button class="yf-button yf-button--sm" aria-pressed="false">iam</button>   compact: chips, filters
+     Icons are <svg class="yf-icon">, before or after the label. aria-busy="true" swaps
+     the label for a spinner and keeps the width. aria-pressed="true" fills it with ink. */
+
+  .yf-button {
+    --_bg: transparent;
+    --_fg: var(--yf-fg);
+    --_bd: var(--yf-fg);
+    --_bg-hover: var(--yf-hover);
+    --_fg-hover: var(--_fg);
+    --_bd-hover: var(--_bd);
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--yf-space-2);
+    block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-4);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    line-height: var(--yf-leading-tight);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    appearance: none;
+  }
+
+  /* an <a class="yf-button"> keeps its own look on focus; the page's link inversion is for text links */
+  .yf-button:focus-visible {
+    background-color: var(--_bg);
+    color: var(--_fg);
+  }
+
+  /* an icon at either end sits closer to the edge than text does */
+  .yf-button:has(> .yf-icon:first-child:not(:only-child)) {
+    padding-inline-start: var(--yf-space-3);
+  }
+
+  .yf-button:has(> .yf-icon:last-child:not(:only-child)) {
+    padding-inline-end: var(--yf-space-3);
+  }
+
+  @media (any-hover: hover) {
+    .yf-button:hover {
+      border-color: var(--_bd-hover);
+      background-color: var(--_bg-hover);
+      color: var(--_fg-hover);
+    }
+  }
+
+  .yf-button:not(:is(:disabled, [aria-disabled="true"])):active {
+    background-image: linear-gradient(var(--yf-selected), var(--yf-selected));
+  }
+
+  /* ---------- variants ---------- */
+
+  /* Solid ink. Hover eases it a step toward the paper and never flips it. */
+  .yf-button--primary {
+    --_bg: var(--yf-primary);
+    --_fg: var(--yf-on-primary);
+    --_bd: var(--yf-primary);
+    --_bg-hover: color-mix(in srgb, var(--yf-primary) 85%, var(--yf-bg));
+    --_fg-hover: var(--yf-on-primary);
+    --_bd-hover: var(--_bg-hover);
+  }
+
+  /* A ghost has no edge, so its hover fill is what shows where it ends; underline on
+     hover is already what .yf-link is for. */
+  .yf-button--ghost {
+    --_bd: transparent;
+  }
+
+  .yf-button--danger {
+    --_fg: var(--yf-danger);
+    --_bd: var(--yf-danger);
+    --_bg-hover: var(--yf-danger);
+    --_fg-hover: var(--yf-bg);
+  }
+
+  .yf-button--icon,
+  .yf-button--close {
+    inline-size: var(--yf-control-h);
+    padding: 0;
+  }
+
+  /* compact: filter chips and dense toolbars. 28px, still above the 24px minimum target. */
+  .yf-button--sm {
+    block-size: var(--yf-control-h-sm);
+    padding: 0 var(--yf-space-3);
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-button--sm:is(.yf-button--icon, .yf-button--close) {
+    inline-size: var(--yf-control-h-sm);
+    padding: 0;
+  }
+
+  /* a close button that draws its own cross, so it needs no sprite */
+  .yf-button--close::before {
+    content: "\00d7";
+    content: "\00d7" / "";
+    font-size: var(--yf-text-xl);
+    font-weight: var(--yf-weight-regular);
+    line-height: 1;
+  }
+
+  /* toggle: pressed is filled ink, and stays put on hover */
+  .yf-button[aria-pressed="true"] {
+    --_bg: var(--yf-primary);
+    --_fg: var(--yf-on-primary);
+    --_bd: var(--yf-primary);
+    --_bg-hover: var(--_bg);
+  }
+
+  /* ---------- busy ---------- */
+
+  .yf-button[aria-busy="true"] {
+    color: transparent;
+    pointer-events: none;
+  }
+
+  .yf-button[aria-busy="true"] > * {
+    opacity: 0;
+  }
+
+  .yf-button[aria-busy="true"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    inline-size: var(--yf-text-base);
+    block-size: var(--yf-text-base);
+    margin: auto;
+    border: 2px solid var(--_fg);
+    border-inline-end-color: transparent;
+    border-radius: 50%;
+  }
+
+  /* ---------- disabled ---------- */
+
+  .yf-button:is(:disabled, [aria-disabled="true"]) {
+    --_bg: transparent;
+    --_fg: var(--yf-muted);
+    --_bd: var(--yf-rule);
+    --_bg-hover: var(--_bg);
+    cursor: not-allowed;
+  }
+
+  .yf-button--primary:is(:disabled, [aria-disabled="true"]) {
+    --_bg: var(--yf-rule);
+  }
+
+  .yf-button--ghost:is(:disabled, [aria-disabled="true"]) {
+    --_bd: transparent;
+  }
+
+  a.yf-button[aria-disabled="true"] {
+    pointer-events: none;
+  }
+
+  /* ---------- button group ----------
+     <div class="yf-button-group" role="group" aria-label="View"> two or more .yf-button </div>
+     Attached, one shared edge between neighbours. */
+
+  .yf-button-group {
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .yf-button-group > .yf-button {
+    border-radius: 0;
+  }
+
+  .yf-button-group > .yf-button:first-child {
+    border-start-start-radius: var(--yf-radius);
+    border-end-start-radius: var(--yf-radius);
+  }
+
+  .yf-button-group > .yf-button:last-child {
+    border-start-end-radius: var(--yf-radius);
+    border-end-end-radius: var(--yf-radius);
+  }
+
+  .yf-button-group > .yf-button:not(:last-child) {
+    border-inline-end-width: 0;
+  }
+
+  .yf-button-group > .yf-button:focus-visible {
+    z-index: 1;
+  }
+
+  /* ---------- link ----------
+     A button or anchor that reads as a link: underlined, inverted on hover and focus. */
+
+  .yf-link {
+    display: inline;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .yf-link:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  @media (any-hover: hover) {
+    .yf-link:hover {
+      background: var(--yf-fg);
+      color: var(--yf-bg);
+    }
+  }
+
+  .yf-link:is(:disabled, [aria-disabled="true"]) {
+    background: none;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  /* ---------- motion ---------- */
+
+  @keyframes yf-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-button {
+      transition:
+        background-color var(--yf-dur-fast) var(--yf-ease-out),
+        border-color var(--yf-dur-fast) var(--yf-ease-out),
+        color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-button[aria-busy="true"]::before {
+      animation: yf-spin calc(var(--yf-dur-slow) * 2) linear infinite;
+    }
+  }
+}
+/* Inputs: field, input, textarea, select, checkbox, radio, switch, fieldset.
+   Every control sits on --yf-sunk with a 1px edge that gets to full ink on hover and
+   focus, and turns danger when aria-invalid="true".
+
+   The resting edge is 55% ink, not --yf-rule: the rule colour is 1.3:1 against the
+   paper, and WCAG 1.4.11 asks 3:1 for the edge of a control. Proposed token:
+   --yf-control-border. Until it exists the same mix is the fallback. */
+
+@layer yf.components {
+  /* ---------- field ----------
+     <div class="yf-field">
+       <label for="email">Email</label>
+       <input class="yf-input" id="email" type="email" aria-describedby="email-help email-error" aria-invalid="true">
+       <p class="yf-help" id="email-help">We only use it to sign you in.</p>
+       <p class="yf-error" id="email-error">Enter an address like name@example.com.</p>
+     </div>
+     .yf-field--inline puts the label beside the control. */
+
+  .yf-field {
+    display: grid;
+    align-content: start;
+    gap: var(--yf-space-2);
+  }
+
+  .yf-label,
+  :where(.yf-field > label) {
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-field:has(:is(:disabled, [aria-disabled="true"])) > :where(label) {
+    color: var(--yf-muted);
+  }
+
+  .yf-help {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  /* danger text led by a "!", so the message is never colour alone */
+  .yf-error {
+    display: flex;
+    align-items: baseline;
+    gap: var(--yf-space-2);
+    color: var(--yf-danger);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-error::before {
+    content: "!";
+    content: "!" / "";
+    flex: none;
+    font-weight: var(--yf-weight-bold);
+  }
+
+  .yf-field--inline {
+    grid-template-columns: minmax(0, var(--yf-field-label, 10rem)) minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--yf-space-4);
+  }
+
+  .yf-field--inline > :where(:not(label, .yf-label)) {
+    grid-column: 2;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-field--inline {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .yf-field--inline > :where(:not(label, .yf-label)) {
+      grid-column: auto;
+    }
+  }
+
+  /* ---------- input, textarea, select ---------- */
+
+  .yf-input,
+  .yf-textarea,
+  .yf-select {
+    --_bd: var(--yf-control-border, color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg)));
+
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding: 0 var(--yf-space-3);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--yf-sunk);
+    color: var(--yf-fg);
+    font: inherit;
+    font-size: var(--yf-text-base); /* 16px, so iOS does not zoom on focus */
+    line-height: var(--yf-leading-normal);
+    appearance: none;
+  }
+
+  .yf-input,
+  .yf-select {
+    block-size: var(--yf-control-h);
+  }
+
+  .yf-textarea {
+    min-block-size: calc(var(--yf-control-h) * 3);
+    padding-block: var(--yf-space-2);
+    resize: vertical;
+  }
+
+  .yf-input::placeholder,
+  .yf-textarea::placeholder {
+    color: var(--yf-muted);
+    opacity: 1;
+  }
+
+  .yf-input::file-selector-button {
+    margin-inline-end: var(--yf-space-3);
+    padding: 0 var(--yf-space-3);
+    border: 0;
+    border-inline-end: 1px solid var(--_bd);
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: var(--yf-weight-medium);
+    cursor: pointer;
+  }
+
+  /* the search clear button: an ink cross drawn with gradients, not the browser's blue
+     one; gradients are not images, so a page's CSP needs nothing for it */
+  .yf-input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    margin-inline-start: var(--yf-space-2);
+    background:
+      linear-gradient(45deg, transparent 43%, currentColor 43% 57%, transparent 57%),
+      linear-gradient(-45deg, transparent 43%, currentColor 43% 57%, transparent 57%);
+    color: var(--yf-muted);
+    cursor: pointer;
+  }
+
+  .yf-input[type="search"]::-webkit-search-cancel-button:hover {
+    color: var(--yf-fg);
+  }
+
+  /* the browser's autofill paints its own fill; paint ours over it */
+  .yf-input:-webkit-autofill {
+    -webkit-text-fill-color: var(--yf-fg);
+    box-shadow: inset 0 0 0 100vmax var(--yf-sunk);
+  }
+
+  @media (any-hover: hover) {
+    :is(.yf-input, .yf-textarea, .yf-select):hover:not(:is(:disabled, [readonly], [aria-disabled="true"], [aria-invalid="true"])) {
+      --_bd: var(--yf-fg);
+    }
+  }
+
+  /* Focus is the border itself, thickened to 2px with an inset line so nothing moves,
+     instead of the page's outside ring. A transparent outline stays for forced-colours
+     mode, which drops shadows. */
+  :is(.yf-input, .yf-textarea, .yf-select):focus {
+    --_bd: var(--yf-fg);
+    box-shadow: inset 0 0 0 1px var(--_bd);
+    outline: 2px solid transparent;
+    outline-offset: 0;
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select)[aria-invalid="true"] {
+    --_bd: var(--yf-danger);
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select)[readonly] {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select):is(:disabled, [aria-disabled="true"]) {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  /* ---------- select ----------
+     The chevron is two gradient strokes, so it takes the text colour in either theme
+     and needs no image, no data: URI and nothing from the page's CSP. */
+
+  .yf-select {
+    --_arm: 0.4em;
+    --_stroke: 0.06em;
+
+    padding-inline-end: var(--yf-space-6);
+    background-image:
+      linear-gradient(to top right, transparent calc(50% - var(--_stroke)), currentColor calc(50% - var(--_stroke) + 0.02em), currentColor calc(50% + var(--_stroke) - 0.02em), transparent calc(50% + var(--_stroke))),
+      linear-gradient(to top left, transparent calc(50% - var(--_stroke)), currentColor calc(50% - var(--_stroke) + 0.02em), currentColor calc(50% + var(--_stroke) - 0.02em), transparent calc(50% + var(--_stroke)));
+    background-repeat: no-repeat;
+    background-size: var(--_arm) var(--_arm);
+    background-position:
+      right calc(var(--yf-space-3) + var(--_arm)) center,
+      right var(--yf-space-3) center;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  .yf-select:is([multiple], [size]:not([size="1"])) {
+    block-size: auto;
+    padding-block: var(--yf-space-2);
+    padding-inline-end: var(--yf-space-3);
+    background-image: none;
+  }
+
+  .yf-select:is(:disabled, [aria-disabled="true"]) {
+    cursor: not-allowed;
+  }
+
+  /* ---------- checkbox, radio, switch ----------
+     <label class="yf-checkbox"><input type="checkbox" name="a"> <span>Label</span></label>
+     <label class="yf-radio"><input type="radio" name="b"> <span>Label</span></label>
+     <label class="yf-switch"><input type="checkbox" role="switch"> <span>Label</span></label>
+     The native input stays, so keyboard, forms and screen readers work as they do. It
+     is only drawn differently: appearance none, the mark is its ::before. */
+
+  .yf-checkbox,
+  .yf-radio,
+  .yf-switch {
+    --_bd: var(--yf-control-border, color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg)));
+    --_box: var(--yf-text-lg);
+
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--yf-space-2);
+    line-height: var(--yf-leading-normal);
+    cursor: pointer;
+  }
+
+  .yf-checkbox > input,
+  .yf-radio > input,
+  .yf-switch > input {
+    display: grid;
+    flex: none;
+    place-content: center;
+    inline-size: var(--_box);
+    block-size: var(--_box);
+    margin-block-start: var(--yf-space-1); /* centres on the first line, where 1lh is not known */
+    margin-block-start: calc((1lh - var(--_box)) / 2);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--yf-sunk);
+    color: inherit;
+    cursor: inherit;
+    appearance: none;
+  }
+
+  .yf-checkbox > input::before,
+  .yf-radio > input::before {
+    content: "";
+    inline-size: calc(var(--_box) * 0.62);
+    block-size: calc(var(--_box) * 0.62);
+    background: var(--yf-on-primary);
+    transform: scale(0);
+  }
+
+  .yf-checkbox > input::before {
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+  }
+
+  .yf-radio > input,
+  .yf-radio > input::before {
+    border-radius: 50%;
+  }
+
+  .yf-radio > input::before {
+    inline-size: calc(var(--_box) * 0.36);
+    block-size: calc(var(--_box) * 0.36);
+  }
+
+  .yf-checkbox > input:is(:checked, :indeterminate),
+  .yf-radio > input:checked,
+  .yf-switch > input:checked {
+    --_bd: var(--yf-primary);
+    background-color: var(--yf-primary);
+  }
+
+  .yf-checkbox > input:is(:checked, :indeterminate)::before,
+  .yf-radio > input:checked::before {
+    transform: scale(1);
+  }
+
+  .yf-checkbox > input:indeterminate::before {
+    clip-path: polygon(0 38%, 100% 38%, 100% 62%, 0 62%);
+  }
+
+  /* switch: a square thumb in a 3px track, travelling the length of it */
+
+  .yf-switch {
+    --_box: var(--yf-text-xl);
+    --_pad: var(--yf-space-1);
+    --_thumb: calc(var(--_box) - 2px - 2 * var(--_pad));
+  }
+
+  .yf-switch > input {
+    position: relative;
+    display: block;
+    inline-size: calc(var(--_box) * 2);
+  }
+
+  .yf-switch > input::before {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--_pad);
+    inset-inline-start: var(--_pad);
+    inline-size: var(--_thumb);
+    block-size: var(--_thumb);
+    border-radius: calc(var(--yf-radius) - 1px);
+    background: var(--_bd);
+  }
+
+  .yf-switch > input:checked::before {
+    inset-inline-start: calc(100% - var(--_thumb) - var(--_pad));
+    background: var(--yf-on-primary);
+  }
+
+  /* states */
+
+  @media (any-hover: hover) {
+    :is(.yf-checkbox, .yf-radio, .yf-switch) > input:hover:not(:is(:disabled, [aria-disabled="true"], [aria-invalid="true"])) {
+      --_bd: var(--yf-fg);
+    }
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input[aria-invalid="true"] {
+    --_bd: var(--yf-danger);
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch):has(> input:is(:disabled, [aria-disabled="true"])) {
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input:is(:disabled, [aria-disabled="true"]) {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input:is(:disabled, [aria-disabled="true"]):is(:checked, :indeterminate) {
+    background-color: var(--yf-rule);
+  }
+
+  :is(.yf-checkbox, .yf-radio) > input:is(:disabled, [aria-disabled="true"])::before,
+  .yf-switch > input:is(:disabled, [aria-disabled="true"]):checked::before {
+    background: var(--yf-muted);
+  }
+
+  .yf-switch > input:is(:disabled, [aria-disabled="true"]):not(:checked)::before {
+    background: var(--yf-rule);
+  }
+
+  /* forced colours drop backgrounds, which would hide a tick drawn as one */
+  @media (forced-colors: active) {
+    :is(.yf-checkbox, .yf-radio) > input::before,
+    .yf-switch > input::before {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .yf-switch > input:checked {
+      border-color: Highlight;
+    }
+  }
+
+  /* ---------- fieldset ----------
+     <fieldset class="yf-fieldset"><legend>Notify me by</legend> ...checkboxes... </fieldset>
+     --inline lays the options in a row. */
+
+  .yf-fieldset {
+    display: grid;
+    align-content: start;
+    gap: var(--yf-space-3);
+    padding: 0;
+    border: 0;
+  }
+
+  .yf-fieldset > legend {
+    padding: 0 0 var(--yf-space-3);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-fieldset--inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--yf-space-2) var(--yf-space-5);
+  }
+
+  .yf-fieldset--inline > :is(.yf-help, .yf-error) {
+    flex-basis: 100%;
+  }
+
+  /* ---------- motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    :is(.yf-input, .yf-textarea, .yf-select) {
+      transition: border-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    :is(.yf-checkbox, .yf-radio, .yf-switch) > input {
+      transition:
+        background-color var(--yf-dur-fast) var(--yf-ease-out),
+        border-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    :is(.yf-checkbox, .yf-radio) > input::before {
+      transition: transform var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-switch > input::before {
+      transition:
+        inset-inline-start var(--yf-dur) var(--yf-ease-out),
+        background-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+  }
+}
+/* Feedback: toast, banner, tooltip. Status colour shows on the mark and the rule
+   only; the words stay ink. A status is always a mark plus words, never colour alone. */
+
+@layer yf.components {
+  /* ---------- toast ----------
+     <div class="yf-toaster" aria-live="polite"> (yf.toast() makes it for you)
+       <div class="yf-toast yf-toast--success">
+         <span class="yf-toast__icon" aria-hidden="true"></span>
+         <div class="yf-toast__body"><p class="yf-toast__message">Report saved.</p></div>
+         <button class="yf-link yf-toast__action" type="button">Undo</button>
+         <button class="yf-button yf-button--ghost yf-button--close yf-toast__dismiss" type="button" aria-label="Dismiss"></button>
+       </div>
+     </div>
+     Bottom right on a desktop, the full width at the bottom on a phone. yf.toast makes the
+     region a manual popover (so it can sit above a modal dialog); the rule below also takes
+     back the popover's own look: centred, bordered, padded, filled. */
+
+  .yf-toaster {
+    position: fixed;
+    inset: auto;
+    inset-block-end: var(--yf-space-4);
+    inset-inline-end: var(--yf-space-4);
+    z-index: var(--yf-z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--yf-space-2);
+    inline-size: min(var(--yf-toast-width, 26rem), 100% - 2 * var(--yf-space-4));
+    block-size: auto;
+    margin: 0;
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
+    overflow: visible;
+    border: 0;
+    background: none;
+    color: inherit;
+    pointer-events: none;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-toaster {
+      inset-inline: var(--yf-space-3);
+      inset-block-end: var(--yf-space-3);
+      inline-size: auto;
+    }
+
+    /* an open dialog keeps its buttons at the bottom, so its toasts come from the top,
+       newest nearest the edge */
+    dialog > .yf-toaster {
+      inset-block: calc(var(--yf-space-3) + env(safe-area-inset-top, 0px)) auto;
+      flex-direction: column-reverse;
+      padding: 0;
+    }
+
+    dialog > .yf-toaster > .yf-toast {
+      --_shift: calc(-1 * var(--yf-space-2));
+    }
+  }
+
+  .yf-toast {
+    --_status: var(--yf-fg);
+
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-2) var(--yf-space-2) var(--yf-space-2) var(--yf-space-4);
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+    font-size: var(--yf-text-sm);
+    pointer-events: auto;
+  }
+
+  .yf-toast__body {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .yf-toast__message {
+    overflow-wrap: anywhere;
+  }
+
+  .yf-toast__action {
+    flex: none;
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+  }
+
+  .yf-toast__dismiss {
+    flex: none;
+  }
+
+  /* ---------- banner ----------
+     <div class="yf-banner yf-banner--danger" role="alert">
+       <span class="yf-banner__icon" aria-hidden="true"></span>
+       <div class="yf-banner__body">
+         <p class="yf-banner__title">Scan failed</p>
+         <p>The repository could not be reached.</p>
+       </div>
+     </div>
+     Quiet on purpose: a sunk panel with a 4px rule in the status colour and the mark. No
+     tinted fill, so a page of banners stays ink on paper. Square, like the rest of the layout.
+     No modifier is the neutral note (ink); --info says the same thing out loud. */
+
+  .yf-banner {
+    --_status: var(--yf-fg);
+
+    display: flex;
+    align-items: baseline;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-3) var(--yf-space-4);
+    border: var(--yf-border);
+    border-inline-start: var(--yf-space-1) solid var(--_status);
+    background: var(--yf-sunk);
+    color: var(--yf-fg);
+    font-size: var(--yf-text-sm);
+  }
+
+  /* the mark sits on the middle of the first line: the line is the banner's, not the mark's */
+  .yf-banner__icon {
+    align-self: flex-start;
+    margin-block-start: calc((var(--yf-text-sm) * var(--yf-leading-normal) - var(--_mark)) / 2);
+  }
+
+  .yf-banner__body {
+    flex: 1 1 auto;
+    display: grid;
+    gap: var(--yf-space-1);
+    min-inline-size: 0;
+  }
+
+  .yf-banner__title {
+    font-weight: var(--yf-weight-medium);
+  }
+
+  /* ---------- status mark ----------
+     The small square at the start of a toast or banner. It draws its own glyph, so it
+     needs no sprite: i (info), a tick (success), ! in a triangle (warning), ! (danger).
+     Keep the span empty (no whitespace) to get the glyph, or put an
+     <svg class="yf-icon"> in it to use an icon instead. */
+
+  .yf-toast__icon,
+  .yf-banner__icon {
+    --_mark: var(--yf-text-lg);
+
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--_mark);
+    block-size: var(--_mark);
+    border-radius: var(--yf-radius);
+    background: var(--_status);
+    color: var(--yf-bg);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-bold);
+    line-height: 1;
+    user-select: none;
+  }
+
+  :is(.yf-toast__icon, .yf-banner__icon) > .yf-icon {
+    inline-size: var(--yf-text-sm);
+    block-size: var(--yf-text-sm);
+  }
+
+  /* the mark is aria-hidden, so its glyph needs no empty alt text (and a var() beside the
+     alt syntax would blank the glyph in a browser that lacks it) */
+  :is(.yf-toast__icon, .yf-banner__icon):empty::before {
+    content: var(--_glyph, "i");
+  }
+
+  .yf-toast--success,
+  .yf-banner--success {
+    --_status: var(--yf-success);
+  }
+
+  .yf-toast--warning,
+  .yf-banner--warning {
+    --_status: var(--yf-warning);
+    --_glyph: "!";
+  }
+
+  .yf-toast--danger,
+  .yf-banner--danger {
+    --_status: var(--yf-danger);
+    --_glyph: "!";
+  }
+
+  :is(.yf-toast--success, .yf-banner--success) :is(.yf-toast__icon, .yf-banner__icon):empty::before {
+    content: "";
+    inline-size: calc(var(--_mark) * 0.62);
+    block-size: calc(var(--_mark) * 0.62);
+    background: var(--yf-bg);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+  }
+
+  :is(.yf-toast--warning, .yf-banner--warning) :is(.yf-toast__icon, .yf-banner__icon) {
+    padding-block-start: 0.2em;
+    border-radius: 0;
+    clip-path: polygon(50% 4%, 100% 94%, 0 94%);
+  }
+
+  /* ---------- tooltip ----------
+     <button class="yf-button yf-button--icon" aria-label="Copy" data-yf-tooltip="Copy">
+     CSS only: the text lives in ::after, taken from the attribute, and shows on hover and
+     keyboard focus. It is supplementary: the trigger must already have its own name
+     (aria-label or visible text), and the generated text is kept out of the accessible
+     name. yf.tooltip (15-tooltip.js) adds Escape to dismiss it, as WCAG 1.4.13 asks,
+     and exposes it as the description. Elements that cannot have a ::after (input, img,
+     svg) need a wrapper. Placement: data-yf-tooltip-pos="top|bottom|left|right". */
+
+  [data-yf-tooltip] {
+    position: relative;
+  }
+
+  [data-yf-tooltip]::after {
+    content: attr(data-yf-tooltip);
+    content: attr(data-yf-tooltip) / "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: 50%;
+    z-index: var(--yf-z-dropdown);
+    translate: -50% 0;
+    inline-size: max-content;
+    max-inline-size: var(--yf-tooltip-max, 16rem);
+    padding: var(--yf-space-1) var(--yf-space-2);
+    /* a transparent border bridges the gap, so the pointer can reach the tip without losing the hover */
+    border-block-end: var(--yf-space-1) solid transparent;
+    border-radius: var(--yf-radius);
+    background: var(--yf-fg);
+    background-clip: padding-box;
+    color: var(--yf-bg);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-xs);
+    font-style: normal;
+    font-weight: var(--yf-weight-regular);
+    letter-spacing: normal;
+    line-height: var(--yf-leading-normal);
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    white-space: normal;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    /* display none while hidden: an invisible tip still counts as scrollable overflow,
+       and one at the right edge of the page would give it a horizontal scrollbar */
+    display: none;
+  }
+
+  [data-yf-tooltip-pos="bottom"]::after {
+    inset-block: 100% auto;
+    border-block: var(--yf-space-1) solid transparent;
+    border-block-end: 0;
+  }
+
+  [data-yf-tooltip-pos="left"]::after {
+    inset-block: 50% auto;
+    inset-inline: auto 100%;
+    translate: 0 -50%;
+    border-block-end: 0;
+    border-inline-end: var(--yf-space-1) solid transparent;
+  }
+
+  [data-yf-tooltip-pos="right"]::after {
+    inset-block: 50% auto;
+    inset-inline: 100% auto;
+    translate: 0 -50%;
+    border-block-end: 0;
+    border-inline-start: var(--yf-space-1) solid transparent;
+  }
+
+  [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (any-hover: hover) {
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  /* ---------- motion ---------- */
+
+  @keyframes yf-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--_shift, var(--yf-space-2)));
+    }
+  }
+
+  @keyframes yf-toast-out {
+    to {
+      opacity: 0;
+      transform: translateY(var(--yf-space-1));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-toast {
+      animation: yf-toast-in var(--yf-dur) var(--yf-ease-out);
+    }
+
+    .yf-toast[data-leaving] {
+      animation: yf-toast-out var(--yf-dur-fast) var(--yf-ease-in) forwards;
+    }
+
+    /* the tip leaves at once and arrives after a beat of intent */
+    [data-yf-tooltip]::after {
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-out),
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+      transition-delay: 0s;
+    }
+
+    @starting-style {
+      [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+        opacity: 0;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (any-hover: hover) {
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+      transition-delay: var(--yf-dur);
+    }
+
+    @starting-style {
+      [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+        opacity: 0;
+      }
+    }
+  }
+}
+/* Overlays: dialog, menu, tabs. Dialog and menu are the platform's own <dialog> and
+   popover, so Escape, focus return and the top layer come free. The three overlays
+   (these two and the toast) share one look: paper, a 1px ink edge, the overlay shadow. */
+
+@layer yf.components {
+  /* ---------- dialog ----------
+     <button class="yf-button" data-yf-dialog-open="confirm" command="show-modal" commandfor="confirm">Delete</button>
+     <dialog class="yf-dialog" id="confirm" aria-labelledby="confirm-title">
+       <div class="yf-dialog__header">
+         <h2 class="yf-dialog__title" id="confirm-title">Delete this report?</h2>
+         <button class="yf-button yf-button--ghost yf-button--close" data-yf-dialog-close aria-label="Close"></button>
+       </div>
+       <div class="yf-dialog__body">...</div>
+       <form class="yf-dialog__footer" method="dialog"> buttons; a submit closes it, with no JS </form>
+     </dialog>
+     Square, like the layout. Backdrop is a veil of the paper colour, so it dims the page
+     the same way in light and dark. --yf-dialog-width sets the width. */
+
+  .yf-dialog {
+    inline-size: min(var(--yf-dialog-width, 30rem), 100% - 2 * var(--yf-space-4));
+    max-inline-size: none;
+    max-block-size: calc(100vh - 2 * var(--yf-space-4));
+    max-block-size: calc(100dvh - 2 * var(--yf-space-4));
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius-layout);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+  }
+
+  .yf-dialog--wide {
+    --yf-dialog-width: 44rem;
+  }
+
+  .yf-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .yf-dialog::backdrop {
+    background: color-mix(in srgb, var(--yf-bg) 80%, transparent);
+  }
+
+  /* the page behind a modal does not scroll */
+  :root:has(.yf-dialog:modal) {
+    overflow: hidden;
+  }
+
+  .yf-dialog__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-2) var(--yf-space-2) var(--yf-space-2) var(--yf-space-5);
+    border-block-end: var(--yf-border);
+  }
+
+  .yf-dialog__title {
+    font-size: var(--yf-text-lg);
+  }
+
+  .yf-dialog__body {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    padding: var(--yf-space-5);
+    overflow-y: auto;
+  }
+
+  .yf-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--yf-space-2);
+    padding: var(--yf-space-4) var(--yf-space-5);
+    border-block-start: var(--yf-border);
+  }
+
+  /* ---------- menu ----------
+     <button class="yf-button" popovertarget="actions">Actions</button>
+     <div class="yf-menu" id="actions" popover aria-label="Actions">
+       <button class="yf-menu__item">Rename</button>
+       <div class="yf-menu__separator"></div>
+       <button class="yf-menu__item yf-menu__item--danger">Delete</button>
+     </div>
+     Opens under its trigger through CSS anchor positioning and flips when it would leave
+     the screen. Where that is not supported, 14-menu.js places it. Without JS it still
+     opens and closes (popovertarget) and the items are buttons; the script adds the menu
+     roles together with the arrow keys that go with them. */
+
+  .yf-menu {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    min-inline-size: var(--yf-menu-min, 12rem);
+    max-inline-size: calc(100% - 2 * var(--yf-space-4));
+    max-block-size: calc(100vh - 2 * var(--yf-space-4));
+    max-block-size: calc(100dvh - 2 * var(--yf-space-4));
+    padding: var(--yf-space-1);
+    overflow: auto;
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+  }
+
+  /* The column lives on the menu itself, not only while open: a closing menu keeps
+     display: flex until its fade ends, and must not lay its items out in a row meanwhile. */
+  .yf-menu {
+    flex-direction: column;
+  }
+
+  .yf-menu:popover-open {
+    display: flex;
+  }
+
+  @supports (position-area: block-end) {
+    .yf-menu {
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+      margin-block: var(--yf-space-1);
+    }
+  }
+
+  .yf-menu__item {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-2);
+    inline-size: 100%;
+    min-block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-3);
+    border: 0;
+    border-radius: var(--yf-radius);
+    background: transparent;
+    color: var(--yf-fg);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    text-align: start;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .yf-menu__item > .yf-icon {
+    flex: none;
+  }
+
+  /* the key is the focus mark here: the row inverts, as links do, so no ring is needed */
+  .yf-menu__item:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+    outline: 0;
+  }
+
+  @media (any-hover: hover) {
+    .yf-menu__item:hover {
+      background: var(--yf-hover);
+    }
+
+    .yf-menu__item:focus-visible:hover {
+      background: var(--yf-fg);
+    }
+  }
+
+  .yf-menu__item:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-menu__item--danger {
+    color: var(--yf-danger);
+  }
+
+  @media (any-hover: hover) {
+    .yf-menu__item--danger:hover {
+      background: var(--yf-danger-bg);
+    }
+
+    .yf-menu__item--danger:focus-visible:hover {
+      background: var(--yf-danger);
+    }
+  }
+
+  .yf-menu__item--danger:focus-visible {
+    background: var(--yf-danger);
+    color: var(--yf-bg);
+  }
+
+  .yf-menu__item:is(:disabled, [aria-disabled="true"]) {
+    background: transparent;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  .yf-menu__shortcut {
+    margin-inline-start: auto;
+    padding-inline-start: var(--yf-space-4);
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-menu__item:focus-visible > .yf-menu__shortcut {
+    color: inherit;
+  }
+
+  .yf-menu__label {
+    padding: var(--yf-space-2) var(--yf-space-3) var(--yf-space-1);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-menu__separator {
+    block-size: 1px;
+    margin-block: var(--yf-space-1);
+    border: 0;
+    background: var(--yf-rule);
+  }
+
+  /* ---------- tabs ----------
+     <div class="yf-tabs" data-yf-tabs>
+       <div role="tablist" aria-label="Report">
+         <button role="tab" id="t-a" aria-controls="p-a" aria-selected="true">Summary</button>
+         <button role="tab" id="t-b" aria-controls="p-b" aria-selected="false" tabindex="-1">Findings</button>
+       </div>
+       <div role="tabpanel" id="p-a" aria-labelledby="t-a" tabindex="0">...</div>
+       <div role="tabpanel" id="p-b" aria-labelledby="t-b" tabindex="0" hidden>...</div>
+     </div>
+     The active tab has a 2px ink underline on the list's hairline; the label stays
+     600 for all, so nothing moves when the selection does. The list scrolls sideways
+     on a narrow screen, its far edge fading while there is more (as .yf-scroller does).
+     A count goes after the label: Open <span class="yf-count">12</span>.
+     Tabs need the script (13-tabs.js) to switch. */
+
+  .yf-tabs > [role="tablist"] {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    background-image: linear-gradient(var(--yf-rule), var(--yf-rule));
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 100% 1px;
+  }
+
+  .yf-tabs > [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .yf-tabs > [role="tablist"] {
+      mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      animation: yf-edge-fade linear both;
+      animation-timeline: scroll(self inline);
+    }
+
+    .yf-tabs > [role="tablist"]:dir(rtl) {
+      mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+    }
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"] {
+    position: relative;
+    flex: none;
+    block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-4);
+    border: 0;
+    background: none;
+    color: var(--yf-muted);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--yf-space-4);
+    inset-block-end: 0;
+    block-size: 2px;
+    background: var(--yf-fg);
+    transform: scaleX(0);
+  }
+
+  @media (any-hover: hover) {
+    .yf-tabs > [role="tablist"] > [role="tab"]:hover {
+      color: var(--yf-fg);
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"][aria-selected="true"] {
+    color: var(--yf-fg);
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"] > .yf-count {
+    margin-inline-start: var(--yf-space-1);
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"][aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  /* the ring goes inside the tab: the list scrolls, and a ring outside would be cut off */
+  .yf-tabs > [role="tablist"] > [role="tab"]:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"]:is(:disabled, [aria-disabled="true"]) {
+    background: none;
+    color: color-mix(in srgb, var(--yf-muted) 55%, var(--yf-bg));
+    cursor: not-allowed;
+  }
+
+  .yf-tabs > [role="tabpanel"] {
+    padding-block-start: var(--yf-space-5);
+  }
+
+  /* ---------- motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-dialog,
+    .yf-dialog::backdrop {
+      opacity: 0;
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-in),
+        translate var(--yf-dur-fast) var(--yf-ease-in),
+        overlay var(--yf-dur-fast) allow-discrete,
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    .yf-dialog {
+      translate: 0 var(--yf-space-2);
+    }
+
+    .yf-dialog[open],
+    .yf-dialog[open]::backdrop {
+      opacity: 1;
+      transition-duration: var(--yf-dur);
+      transition-timing-function: var(--yf-ease-out);
+    }
+
+    .yf-dialog[open] {
+      translate: 0 0;
+    }
+
+    @starting-style {
+      .yf-dialog[open],
+      .yf-dialog[open]::backdrop {
+        opacity: 0;
+      }
+
+      .yf-dialog[open] {
+        translate: 0 var(--yf-space-2);
+      }
+    }
+
+    .yf-menu {
+      opacity: 0;
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-in),
+        overlay var(--yf-dur-fast) allow-discrete,
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    .yf-menu:popover-open {
+      opacity: 1;
+      transition-timing-function: var(--yf-ease-out);
+    }
+
+    @starting-style {
+      .yf-menu:popover-open {
+        opacity: 0;
+      }
+    }
+
+    .yf-tabs > [role="tablist"] > [role="tab"] {
+      transition:
+        color var(--yf-dur-fast) var(--yf-ease-out),
+        background-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-tabs > [role="tablist"] > [role="tab"]::after {
+      transition: transform var(--yf-dur) var(--yf-ease-out);
+    }
+  }
+}
+/* Data: icons, table, status pill, stat, key-value list, progress, meter, code block,
+   sparkline and chart helpers. Tokens only. Every JS-driven part also reads right
+   without JS (the sparkline falls back to its host text, sorting to plain headers). */
+
+@layer yf.components {
+  /* ---------- icons ----------
+     <svg class="yf-icon" aria-hidden="true"><use href="icons/yf-icons.svg#check"/></svg>
+     Sized by CSS (the sprite has no width or height), coloured by currentColor.
+     An icon with no visible text next to it needs role="img" and an aria-label. */
+
+  .yf-icon {
+    display: inline-block;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+    vertical-align: -0.125em;
+  }
+
+  .yf-icon--sm {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .yf-icon--lg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .yf-icon--xl {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* hides a sprite that is pasted into the page instead of loaded from a file */
+  .yf-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* ---------- table ----------
+     <div class="yf-table-wrap" tabindex="0" role="region" aria-label="Findings">
+       <table class="yf-table" data-yf-sortable> ... </table>
+     </div>
+     Ruled, no boxes. Cells carry 12px of side padding so a hover or selected fill
+     never hugs the text; the rules run edge to edge. */
+
+  .yf-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .yf-table-wrap:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  /* a sticky header needs something to stick to: the wrap scrolls vertically too.
+     Override the height with --yf-table-max-h on the wrap; .yf-table-wrap--tall is 40rem. */
+  .yf-table-wrap:has(.yf-table--sticky) {
+    max-height: var(--yf-table-max-h, 28rem);
+    overflow-y: auto;
+  }
+
+  .yf-table-wrap--tall {
+    --yf-table-max-h: 40rem;
+  }
+
+  .yf-table {
+    width: 100%;
+    /* separate, not collapsed: borders on collapsed cells do not travel with a sticky header */
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--yf-fg);
+    font-size: var(--yf-text-sm);
+    line-height: 1.45;
+    text-align: left;
+  }
+
+  .yf-table caption {
+    padding: 0 var(--yf-space-3) var(--yf-space-2);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    text-align: left;
+    caption-side: top;
+  }
+
+  .yf-table :is(th, td) {
+    padding: 0.625rem var(--yf-space-3);
+    border-bottom: 1px solid var(--yf-rule);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .yf-table thead th {
+    padding-block: var(--yf-space-2);
+    border-bottom: 1px solid var(--yf-fg);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+  }
+
+  /* a row header reads as the row's name */
+  .yf-table tbody th {
+    color: var(--yf-fg);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  /* numbers: right-aligned, tabular. .yf-num is the same switch outside tables. */
+  .yf-table :is(th, td):is(.yf-num, [data-type="number"]) {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* ids, hashes, paths: mono, one line */
+  .yf-table :is(th, td):is(.yf-mono, [data-type="mono"]) {
+    font-family: var(--yf-font-mono);
+    font-size: 0.8125rem;
+    font-variant-ligatures: none;
+    white-space: nowrap;
+  }
+
+  .yf-table td:has(> .yf-status) {
+    white-space: nowrap;
+  }
+
+  /* Text never squeezes under a word or two: on a narrow screen the wrap scrolls instead.
+     A cell with a data-type (number, mono, or the page's own: a pill, the actions) sizes to
+     its content. --yf-cell-min on a cell (or a column's cells) changes the minimum, 0 lets it
+     shrink, and .yf-wide on the cells of the column that carries the sentence keeps 14rem. */
+  .yf-table td:not(:is(.yf-num, .yf-mono, [data-type])) {
+    min-width: var(--yf-cell-min, 7rem);
+  }
+
+  .yf-table td.yf-wide {
+    --yf-cell-min: 14rem;
+  }
+
+  .yf-table tbody tr {
+    transition: background-color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  @media (hover: hover) {
+    .yf-table tbody tr:hover {
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-table tbody tr:is([aria-selected="true"], .is-selected) {
+    background: var(--yf-selected);
+  }
+
+  /* muted text on the hover and selected fills drops under 4.5:1, so inside those rows it
+     steps up toward ink (it is still lighter than the text around it) */
+  .yf-table tbody tr:is([aria-selected="true"], .is-selected) {
+    --yf-muted: color-mix(in srgb, var(--yf-fg) 80%, var(--yf-bg));
+  }
+
+  @media (hover: hover) {
+    .yf-table tbody tr:hover {
+      --yf-muted: color-mix(in srgb, var(--yf-fg) 80%, var(--yf-bg));
+    }
+  }
+
+  /* sticky header: sticks to the wrap. The paper behind it is opaque. */
+  .yf-table--sticky thead th {
+    position: sticky;
+    top: -1px; /* not 0: a wrap at a fractional offset would show a hairline of the rows above the header */
+    z-index: var(--yf-z-sticky);
+    background: var(--yf-table-bg, var(--yf-bg));
+  }
+
+  /* sortable headers: <th aria-sort="none"><button type="button">Name</button></th>.
+     yf.table adds the button when a th[aria-sort] has none. */
+  .yf-table th[aria-sort] > button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yf-space-2);
+    margin: -0.25rem -0.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: var(--yf-radius);
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    transition: background-color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  .yf-table th[aria-sort] > button:hover {
+    background: var(--yf-hover);
+    color: var(--yf-fg);
+  }
+
+  .yf-table th[aria-sort] > button:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-table th[aria-sort] > button:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 0;
+  }
+
+  .yf-table th[aria-sort]:is([aria-sort="ascending"], [aria-sort="descending"]) {
+    color: var(--yf-fg);
+  }
+
+  /* the indicator: both arrows, dim, when unsorted; one arrow, solid, when sorted */
+  .yf-table th[aria-sort] > button::after {
+    content: "";
+    flex: none;
+    width: 0.5rem;
+    height: 0.75rem;
+    background: currentColor;
+    opacity: 0.45;
+    clip-path: polygon(0 42%, 50% 8%, 100% 42%, 0 42%, 0 58%, 50% 92%, 100% 58%, 0 58%);
+  }
+
+  .yf-table th[aria-sort="ascending"] > button::after {
+    opacity: 1;
+    clip-path: polygon(0 65%, 50% 30%, 100% 65%);
+  }
+
+  .yf-table th[aria-sort="descending"] > button::after {
+    opacity: 1;
+    clip-path: polygon(0 35%, 50% 70%, 100% 35%);
+  }
+
+  /* numeric columns keep their label flush right, the arrow on its left */
+  .yf-table th:is(.yf-num, [data-type="number"]) > button {
+    flex-direction: row-reverse;
+  }
+
+  /* empty state: one row, shown only while no other row is visible in the body
+     (a filter that sets hidden on rows counts) */
+  .yf-table__empty td {
+    padding: var(--yf-space-6) var(--yf-space-3);
+    color: var(--yf-muted);
+    text-align: center;
+  }
+
+  .yf-table tbody:has(> tr:not(.yf-table__empty, [hidden])) > .yf-table__empty {
+    display: none;
+  }
+
+  .yf-table tbody tr.yf-table__empty:hover {
+    background: none;
+  }
+
+  /* ---------- status pill ----------
+     <span class="yf-status yf-status--danger">Critical</span>
+     The label is always text. The dot is a second cue, never the only one; an icon
+     as the first child replaces the dot. Without a modifier (or with --neutral) it is
+     an outline. */
+
+  .yf-status {
+    --_fg: var(--yf-muted);
+    --_bg: transparent;
+    --_bd: var(--yf-rule);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.0625rem 0.4375rem;
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  /* the plain pill is the neutral one: an outline with a hollow dot */
+  .yf-status::before {
+    content: "";
+    flex: none;
+    box-sizing: border-box;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .yf-status:has(> .yf-icon)::before {
+    display: none;
+  }
+
+  .yf-status > .yf-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-inline: -0.0625rem;
+  }
+
+  .yf-status--danger {
+    --_fg: var(--yf-danger);
+    --_bg: var(--yf-danger-bg);
+    --_bd: transparent;
+  }
+
+  .yf-status--warning {
+    --_fg: var(--yf-warning);
+    --_bg: var(--yf-warning-bg);
+    --_bd: transparent;
+  }
+
+  .yf-status--success {
+    --_fg: var(--yf-success);
+    --_bg: var(--yf-success-bg);
+    --_bd: transparent;
+  }
+
+  /* a status colour has a solid dot */
+  :is(.yf-status--danger, .yf-status--warning, .yf-status--success)::before {
+    background: currentColor;
+  }
+
+  /* ---------- count ----------
+     <span class="yf-count">12</span> after a label: in a tab, a button, a nav link.
+     Tabular figures on the rule colour, like inline code. It takes the label's colour, so
+     a selected tab's count is ink and a resting one muted. The label says what it counts. */
+
+  .yf-count {
+    display: inline-block;
+    min-inline-size: 1.6em;
+    padding: 0.1em 0.4em;
+    border-radius: var(--yf-radius);
+    background: var(--yf-rule);
+    color: inherit;
+    font-size: var(--yf-text-xs);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  /* on solid ink (a primary or pressed button) the rule colour would vanish */
+  :is(.yf-button--primary, .yf-button[aria-pressed="true"]) .yf-count {
+    background: color-mix(in srgb, var(--yf-on-primary) 22%, transparent);
+  }
+
+  /* ---------- stat ----------
+     <dl class="yf-stats-row">
+       <div class="yf-stat">
+         <dt class="yf-stat__label">Open findings</dt>
+         <dd class="yf-stat__value">42</dd>
+         <dd class="yf-stat__delta yf-stat__delta--up yf-stat__delta--danger">+6 since Monday</dd>
+         <dd><span class="yf-sparkline" data-yf-sparkline="3,5,4,8"></span></dd>
+       </div>
+     </dl>
+     Any element works for .yf-stat; the delta text carries the meaning, the arrow is extra. */
+
+  .yf-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--yf-space-1);
+    min-width: 0;
+    margin: 0;
+  }
+
+  .yf-stat :is(dt, dd) {
+    margin: 0;
+  }
+
+  .yf-stat__label {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.3;
+  }
+
+  .yf-stat__value {
+    font-size: var(--yf-text-2xl);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-display);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-stat__unit {
+    margin-left: 0.15em;
+    color: var(--yf-muted);
+    font-size: 0.5em;
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: 0;
+  }
+
+  .yf-stat__delta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25em;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.4;
+  }
+
+  .yf-stat__delta--up::before {
+    content: "\2191";
+  }
+
+  .yf-stat__delta--down::before {
+    content: "\2193";
+  }
+
+  @supports (content: "x" / "") {
+    .yf-stat__delta--up::before {
+      content: "\2191" / "";
+    }
+
+    .yf-stat__delta--down::before {
+      content: "\2193" / "";
+    }
+  }
+
+  .yf-stat__delta--danger {
+    color: var(--yf-danger);
+  }
+
+  .yf-stat__delta--warning {
+    color: var(--yf-warning);
+  }
+
+  .yf-stat__delta--success {
+    color: var(--yf-success);
+  }
+
+  .yf-stat .yf-sparkline {
+    display: block;
+    width: 100%;
+    max-width: 10rem;
+    margin-top: var(--yf-space-2);
+  }
+
+  /* a row of stats with 1px rules between them (like the sample dashboard).
+     Each cell has a left rule; clipping the row's first pixel hides it at the start of
+     every wrapped line, so the rules stay between stats whatever the width. */
+  .yf-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    margin: 0;
+    border-bottom: 1px solid var(--yf-rule);
+    clip-path: inset(0 0 0 1px);
+  }
+
+  .yf-stats-row > .yf-stat {
+    padding: var(--yf-space-4);
+    border-top: 1px solid var(--yf-rule);
+    border-left: 1px solid var(--yf-rule);
+  }
+
+  /* On a phone the stats keep one row and scroll sideways, rather than leave the last one
+     alone on a line; a cell is narrower than half the row, so the next one peeks in. */
+  @media (max-width: 36rem) {
+    .yf-stats-row {
+      grid-template-columns: none;
+      grid-auto-columns: minmax(9.5rem, 1fr);
+      grid-auto-flow: column;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .yf-stats-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .yf-stats-row > .yf-stat {
+      scroll-snap-align: start;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      .yf-stats-row {
+        mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+        animation: yf-edge-fade linear both;
+        animation-timeline: scroll(self inline);
+      }
+
+      .yf-stats-row:dir(rtl) {
+        mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      }
+    }
+  }
+
+  /* ---------- key-value list ----------
+     <dl class="yf-kv"><div><dt>Region</dt><dd>eu-west-1</dd></div> ... </dl>
+     One value per key. Stacks under 36rem; .yf-kv--stack stacks it at any width. */
+
+  .yf-kv {
+    display: grid;
+    grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr);
+    margin: 0;
+    border-top: 1px solid var(--yf-rule);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+
+  .yf-kv > div {
+    display: contents;
+  }
+
+  .yf-kv :is(dt, dd) {
+    margin: 0;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-kv dt {
+    padding-right: var(--yf-space-4);
+    color: var(--yf-muted);
+  }
+
+  .yf-kv dd {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-kv {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .yf-kv dt {
+      padding-bottom: 0;
+      border-bottom: 0;
+      font-size: var(--yf-text-xs);
+    }
+
+    .yf-kv dd {
+      padding-top: 0.125rem;
+    }
+  }
+
+  .yf-kv--stack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .yf-kv--stack dt {
+    padding-bottom: 0;
+    border-bottom: 0;
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-kv--stack dd {
+    padding-top: 0.125rem;
+  }
+
+  /* ---------- progress ----------
+     <progress class="yf-progress" value="40" max="100" aria-label="Scan progress"></progress>
+     Leave out value for indeterminate. Ink bar on a rule track; ink is not a status. */
+
+  .yf-progress {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 0.375rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+    color: var(--yf-fg);
+  }
+
+  .yf-progress::-webkit-progress-bar {
+    background: transparent;
+  }
+
+  .yf-progress::-webkit-progress-value {
+    background: var(--yf-fg);
+    transition: width var(--yf-dur) var(--yf-ease-out);
+  }
+
+  .yf-progress::-moz-progress-bar {
+    background: var(--yf-fg);
+  }
+
+  /* indeterminate: a bar sweeps along the element's own background, which works in every
+     engine (the pseudo-elements are not animatable in WebKit and Blink) */
+  .yf-progress:indeterminate {
+    background:
+      linear-gradient(var(--yf-fg), var(--yf-fg)) no-repeat -55% 0 / 35% 100%,
+      var(--yf-rule);
+    animation: yf-progress-sweep 1.6s var(--yf-ease-out) infinite;
+  }
+
+  .yf-progress:indeterminate::-webkit-progress-value,
+  .yf-progress:indeterminate::-moz-progress-bar {
+    background: transparent;
+  }
+
+  @keyframes yf-progress-sweep {
+    to {
+      background-position-x: 155%, 0;
+    }
+  }
+
+  /* no motion: a still striped track says "working" without moving */
+  @media (prefers-reduced-motion: reduce) {
+    .yf-progress:indeterminate {
+      background: repeating-linear-gradient(90deg, var(--yf-fg) 0 0.375rem, var(--yf-rule) 0.375rem 0.75rem);
+      animation: none;
+    }
+  }
+
+  /* ---------- meter ----------
+     <meter class="yf-meter" min="0" max="100" low="60" high="85" optimum="0" value="72"></meter>
+     The browser picks the state from low, high and optimum. A healthy value is the
+     normal state, so it stays ink; only the warning and danger ranges take a status
+     colour. Show the value as text beside it. */
+
+  .yf-meter {
+    --yf-meter-optimum: var(--yf-fg);
+    --yf-meter-suboptimum: var(--yf-warning);
+    --yf-meter-danger: var(--yf-danger);
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 0.375rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+  }
+
+  .yf-meter::-webkit-meter-bar {
+    height: 0.375rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+  }
+
+  .yf-meter::-webkit-meter-optimum-value {
+    background: var(--yf-meter-optimum);
+  }
+
+  .yf-meter::-webkit-meter-suboptimum-value {
+    background: var(--yf-meter-suboptimum);
+  }
+
+  .yf-meter::-webkit-meter-even-less-good-value {
+    background: var(--yf-meter-danger);
+  }
+
+  .yf-meter::-moz-meter-bar {
+    background: var(--yf-meter-optimum);
+  }
+
+  .yf-meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: var(--yf-meter-suboptimum);
+  }
+
+  .yf-meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: var(--yf-meter-danger);
+  }
+
+  /* ---------- code block ----------
+     <div class="yf-code">
+       <div class="yf-code__head">
+         <span class="yf-code__file">deploy.sh</span>
+         <button class="yf-code__copy" type="button" data-yf-copy>
+           <svg class="yf-icon yf-icon--sm" aria-hidden="true"><use href="icons/yf-icons.svg#copy"/></svg>
+           <span data-yf-copy-label>Copy</span>
+         </button>
+       </div>
+       <pre tabindex="0"><code>...</code></pre>
+     </div>
+     Without a head, put the button straight inside .yf-code and it floats top right.
+     The pre scrolls; give it tabindex="0" so the keyboard can. */
+
+  .yf-code {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--yf-rule);
+    background: var(--yf-sunk);
+    color: var(--yf-fg);
+    font-family: var(--yf-font-mono);
+    font-size: 0.8125rem;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+    line-height: 1.6;
+  }
+
+  .yf-code__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--yf-space-3);
+    min-height: 2.25rem;
+    padding: var(--yf-space-1) var(--yf-space-2) var(--yf-space-1) var(--yf-space-4);
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-code__file {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .yf-code pre {
+    margin: 0;
+    padding: 0.875rem var(--yf-space-4);
+    overflow: auto;
+    max-height: var(--yf-code-max-h, none);
+    background: none;
+    border: 0;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  .yf-code pre:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: -2px;
+  }
+
+  /* a block of code is not inline code: drop the inline chip */
+  .yf-code pre code {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .yf-code--wrap pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-code__copy {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.75rem;
+    padding: 0 var(--yf-space-2);
+    border: 1px solid transparent;
+    border-radius: var(--yf-radius);
+    background: transparent;
+    color: var(--yf-muted);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color var(--yf-dur-fast) var(--yf-ease-out),
+      color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  .yf-code__copy:hover {
+    background: var(--yf-hover);
+    color: var(--yf-fg);
+  }
+
+  .yf-code__copy:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-code__copy:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  .yf-code__copy:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .yf-code__copy[data-state="copied"] {
+    color: var(--yf-success);
+  }
+
+  /* no head: the button floats over the block. It is opaque, so a long line scrolling under
+     it does not show through. */
+  .yf-code > .yf-code__copy {
+    position: absolute;
+    top: var(--yf-space-2);
+    right: var(--yf-space-2);
+    border-color: var(--yf-rule);
+    background: color-mix(in srgb, var(--yf-fg) 4%, var(--yf-sunk));
+  }
+
+  .yf-code > .yf-code__copy:hover {
+    background: color-mix(in srgb, var(--yf-fg) 9%, var(--yf-sunk));
+  }
+
+  .yf-code > .yf-code__copy:active {
+    background: color-mix(in srgb, var(--yf-fg) 14%, var(--yf-sunk));
+  }
+
+  .yf-code--wrap > .yf-code__copy ~ pre {
+    padding-right: 5.5rem;
+  }
+
+  /* ---------- sparkline ----------
+     <span class="yf-sparkline" data-yf-sparkline="3,5,4,8" data-yf-threshold=">7"></span>
+     yf.sparkline draws the SVG. data-yf-threshold: ">7" (bad above) or "<95" (bad below);
+     a bare number means above. Size the host with CSS; the drawing stretches to it. */
+
+  .yf-sparkline {
+    display: inline-block;
+    width: 6rem;
+    height: 1.5rem;
+    color: var(--yf-fg);
+    line-height: 0;
+    vertical-align: middle;
+  }
+
+  .yf-sparkline > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .yf-sparkline__line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* the last point: a zero-length stroke with round caps is a dot that stays round when the
+     drawing is stretched */
+  .yf-sparkline__dot {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 5;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .yf-sparkline__dot.is-over {
+    stroke: var(--yf-danger);
+  }
+
+  .yf-sparkline__limit {
+    fill: none;
+    stroke: var(--yf-danger);
+    stroke-width: 1;
+    stroke-dasharray: 3 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* ---------- chart helpers (hand- or JS-made SVG) ----------
+     <svg class="yf-chart" viewBox="0 0 340 150">
+       <line class="yf-chart-grid" .../> <text x=".." y="..">25</text>
+       <path class="yf-series-1" fill="none" stroke-width="2" d=".."/>
+     </svg>
+     Series colour, dash and (for shapes) fill come from the series tokens. stroke-width is
+     yours: set it as an attribute, since a CSS rule here would beat that attribute. */
+
+  .yf-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: 10px;
+    font-variant-ligatures: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-chart text {
+    fill: var(--yf-muted);
+    font: inherit;
+    stroke: none;
+  }
+
+  .yf-chart .yf-chart-label {
+    fill: var(--yf-fg);
+  }
+
+  .yf-chart-grid {
+    fill: none;
+    stroke: var(--yf-rule);
+    shape-rendering: crispEdges;
+  }
+
+  .yf-chart-axis {
+    fill: none;
+    stroke: var(--yf-fg);
+    shape-rendering: crispEdges;
+  }
+
+  /* lines (path, polyline, line): ink shade plus dash */
+  :is(path, polyline, line):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: none;
+  }
+
+  /* shapes (rect, circle, ellipse, polygon): filled with the shade, no stroke */
+  :is(rect, circle, ellipse, polygon):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    stroke: none;
+  }
+
+  .yf-series-1 {
+    --_s: var(--yf-series-1);
+    stroke: var(--yf-series-1);
+    stroke-dasharray: var(--yf-dash-1);
+  }
+
+  .yf-series-2 {
+    --_s: var(--yf-series-2);
+    stroke: var(--yf-series-2);
+    stroke-dasharray: var(--yf-dash-2);
+  }
+
+  .yf-series-3 {
+    --_s: var(--yf-series-3);
+    stroke: var(--yf-series-3);
+    stroke-dasharray: var(--yf-dash-3);
+  }
+
+  .yf-series-4 {
+    --_s: var(--yf-series-4);
+    stroke: var(--yf-series-4);
+    stroke-dasharray: var(--yf-dash-4);
+  }
+
+  :is(rect, circle, ellipse, polygon):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: var(--_s);
+  }
+
+  /* a path closed into an area: the shade at low strength under its line */
+  path.yf-area:is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: var(--_s);
+    fill-opacity: 0.12;
+  }
+
+  /* a limit: dashed danger. Status colour is for thresholds only. */
+  .yf-chart-threshold {
+    fill: none;
+    stroke: var(--yf-danger);
+    stroke-dasharray: 4 3;
+    stroke-width: 1;
+  }
+
+  .yf-chart text.yf-chart-threshold {
+    fill: var(--yf-danger);
+    stroke: none;
+  }
+
+  /* legend: <ul class="yf-legend"><li><svg class="yf-legend__key" ...><line class="yf-series-2" .../></svg> Staging</li> */
+  .yf-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-space-1) var(--yf-space-4);
+    margin: 0;
+    padding: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    list-style: none;
+  }
+
+  .yf-legend > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .yf-legend__key {
+    flex: none;
+    width: 1.5rem;
+    height: 0.5rem;
+    overflow: visible;
+  }
+
+  .yf-legend__key :is(line, path, polyline) {
+    stroke-width: 2;
+  }
+
+  /* the legend yf.chart draws sits right under its svg */
+  .yf-chart + .yf-legend {
+    padding-block-start: var(--yf-space-2);
+  }
+}
+/* Content: ported from yoanfaure.com (assets/css/site.css): prose, the git-log list, the
+   meta line, stat callouts, pull quote and figure. The look is the site's; the values
+   are yf tokens. Sizes that the site sets in rem stay in rem, so a block looks the
+   same wherever it sits. */
+
+@layer yf.components {
+  /* ---------- prose: the reading column ----------
+     <article class="yf-prose"> headings, paragraphs, lists, quotes, tables, figures </article>
+     38rem is about 68 characters of Inter at this size. Inline code is base's; pre is
+     styled here. Headings h2 to h4 are spaced here; the h1 is the page's. */
+
+  .yf-prose {
+    max-width: var(--yf-measure);
+    font-size: var(--yf-text-lg);
+    line-height: var(--yf-leading-prose);
+  }
+
+  .yf-prose :is(p, ul, ol, pre, table, blockquote, figure) {
+    margin: 0 0 1.35em;
+  }
+
+  .yf-prose h2 {
+    margin: 2.75rem 0 0.8rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .yf-prose h3 {
+    margin: 2.25rem 0 0.6rem;
+    font-size: 1.2rem;
+    line-height: 1.35;
+  }
+
+  .yf-prose h4 {
+    margin: 1.75rem 0 0.5rem;
+    font-size: var(--yf-text-lg);
+    line-height: 1.4;
+  }
+
+  .yf-prose > :first-child {
+    margin-top: 0;
+  }
+
+  /* the stack around it owns the space below */
+  .yf-prose > :last-child {
+    margin-bottom: 0;
+  }
+
+  .yf-prose ul,
+  .yf-prose ol {
+    padding-left: 1.4em;
+  }
+
+  .yf-prose li + li {
+    margin-top: 0.4em;
+  }
+
+  .yf-prose li > :is(ul, ol) {
+    margin: 0.4em 0 0;
+  }
+
+  .yf-prose strong {
+    font-weight: 650;
+  }
+
+  .yf-prose img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .yf-prose hr {
+    margin: 2.75rem 0;
+    border: 0;
+    border-top: 1px solid var(--yf-rule);
+  }
+
+  /* code blocks: ruled, not filled (a filled, copyable block is .yf-code) */
+  .yf-prose pre {
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    border: 1px solid var(--yf-rule);
+    font-size: var(--yf-text-sm);
+    line-height: var(--yf-leading-normal);
+    tab-size: 2;
+  }
+
+  .yf-prose pre code {
+    padding: 0;
+    background: none;
+    font-size: inherit;
+  }
+
+  /* a plain quote: a rule in ink and italics. The loud one is .yf-quote. */
+  .yf-prose blockquote {
+    padding-left: 1.25em;
+    border-left: 2px solid var(--yf-fg);
+    font-style: italic;
+  }
+
+  .yf-prose blockquote > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* heading permalinks: <a class="yf-anchor" href="#id" aria-label="Link to this section"></a>.
+     Hidden by opacity, not visibility, so the keyboard can still reach them. */
+  .yf-anchor {
+    margin-left: 0.4em;
+    color: var(--yf-muted);
+    font-weight: var(--yf-weight-regular);
+    text-decoration: none;
+    opacity: 0;
+  }
+
+  .yf-anchor::before {
+    content: "#";
+  }
+
+  :is(h2, h3, h4):hover > .yf-anchor,
+  .yf-anchor:focus-visible {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .yf-anchor {
+      opacity: 1;
+    }
+  }
+
+  /* footnotes: <sup><a href="#fn1">1</a></sup>, then <section class="yf-footnotes"><ol>...</ol></section> */
+  .yf-prose sup {
+    line-height: 0;
+  }
+
+  .yf-prose sup a,
+  .yf-footnote-back {
+    text-decoration: none;
+  }
+
+  .yf-footnotes {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--yf-rule);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-footnotes ol {
+    margin: 0;
+  }
+
+  .yf-footnotes p {
+    margin: 0 0 0.5rem;
+  }
+
+  /* tables in prose: ruled, no boxes. (A data table is .yf-table.) */
+  .yf-prose table:not(.yf-table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+  }
+
+  .yf-prose table:not(.yf-table) :is(th, td) {
+    padding: 0.7em 2ch 0.7em 0;
+    border-top: 1px solid var(--yf-rule);
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-prose table:not(.yf-table) :is(th, td):last-child {
+    padding-right: 0;
+  }
+
+  .yf-prose table:not(.yf-table) th {
+    border-top: 0;
+    border-bottom: 1px solid var(--yf-fg);
+    color: var(--yf-muted);
+    font-weight: 650;
+  }
+
+  .yf-prose table:not(.yf-table) tbody tr:last-child td {
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-prose table:not(.yf-table) td:first-child {
+    color: var(--yf-muted);
+  }
+
+  /* ---------- meta line ----------
+     <p class="yf-meta">essay · <time datetime="2026-10-12">12 Oct 2026</time> · <a href="..">a1b2c3d</a></p>
+     or, with the separators drawn by CSS (they stay out of the links):
+     <ul class="yf-meta"><li>essay</li><li><time>..</time></li><li><a>..</a></li></ul>
+     No outer margin: the stack it sits in spaces it (inside .yf-prose it keeps 1rem). In the
+     list form a wrapped line never starts with a dot. */
+
+  .yf-meta {
+    margin: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+
+  .yf-prose .yf-meta {
+    margin: 0 0 1rem;
+  }
+
+  /* Every item draws its dot in the gap before it. The first item of each line has its
+     dot outside the list's start edge, where the clip hides it. The clip keeps room above,
+     below and after for focus rings. */
+  ul.yf-meta,
+  ol.yf-meta {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1em;
+    padding: 0;
+    list-style: none;
+    clip-path: inset(-1em -1em -1em 0);
+  }
+
+  ul.yf-meta:dir(rtl),
+  ol.yf-meta:dir(rtl) {
+    clip-path: inset(-1em 0 -1em -1em);
+  }
+
+  .yf-meta > li + li {
+    margin-top: 0; /* beats the prose list rhythm */
+  }
+
+  .yf-meta > li::before {
+    content: "\00b7";
+    display: inline-block;
+    inline-size: 1em;
+    margin-inline-start: -1em;
+    text-align: center;
+  }
+
+  @supports (content: "x" / "") {
+    .yf-meta > li::before {
+      content: "\00b7" / "";
+    }
+  }
+
+  /* ---------- log: the git-log list ----------
+     <ol class="yf-log"><li class="yf-log__row">
+       <a class="yf-log__hash" href="..">a1b2c3d</a> <time class="yf-log__date">2026-10-12</time>
+       <span class="yf-log__type">essay</span> <a class="yf-log__title" href="..">Title</a>
+     </li></ol>
+     Hash and date are mono, sized by their own ch so they line up whatever the row's font
+     is. Type and title are Inter: the type gets a fixed track, the title the rest. Under
+     600px a row is two lines. .yf-log--lg is the home page's size. */
+
+  .yf-log {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--yf-rule);
+    list-style: none;
+  }
+
+  .yf-log__row {
+    display: grid;
+    grid-template-columns: max-content max-content 3.75em minmax(0, 1fr);
+    column-gap: 1.25em;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-log__hash,
+  .yf-log__date {
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: 0.8em;
+    font-variant-ligatures: none;
+  }
+
+  .yf-log__hash {
+    width: 7ch;
+  }
+
+  .yf-log__date {
+    width: 10ch;
+  }
+
+  .yf-log__hash:not([href]) {
+    text-decoration: none;
+  }
+
+  .yf-log__type {
+    color: var(--yf-muted);
+  }
+
+  .yf-log__title {
+    justify-self: start;
+    font-weight: var(--yf-weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  .yf-log--lg {
+    font-size: var(--yf-text-lg);
+  }
+
+  /* ---------- list: rows of things to pick ----------
+     <ol class="yf-list">
+       <li class="yf-list__item">
+         <span class="yf-list__num">01</span>
+         <a class="yf-list__title" href="#threat-model">Threat model a new service</a>
+         <p class="yf-list__text">One sentence on what it is for.</p>
+         <div class="yf-list__meta"><span class="yf-status">cloud</span></div>
+       </li>
+     </ol>
+     For prompts, reports, runbooks: the things a .yf-log cannot hold. Every part but the
+     title is optional. A linked title makes the whole row its hit area; links and buttons
+     in the meta stay clickable above it. Under 52rem of its own width a row is a title
+     with the rest beneath; wider, the sentence sits beside the title and the meta at the
+     end. */
+
+  .yf-list {
+    margin: 0;
+    padding: 0;
+    border-top: var(--yf-border);
+    list-style: none;
+    container-type: inline-size;
+  }
+
+  .yf-list__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--yf-space-1) var(--yf-space-3);
+    margin: 0;
+    padding: var(--yf-space-3) 0;
+    border-bottom: var(--yf-border);
+  }
+
+  .yf-list__item:has(> .yf-list__num) {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .yf-list__item > :not(.yf-list__num, .yf-list__title) {
+    grid-column: -2;
+  }
+
+  .yf-list__num {
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-list__title {
+    justify-self: start;
+    font-weight: var(--yf-weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  a.yf-list__title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .yf-list__text {
+    margin: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-list__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--yf-space-2);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-list__meta :is(a, button) {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (any-hover: hover) {
+    .yf-list__item:has(> a.yf-list__title):hover {
+      background: var(--yf-hover);
+    }
+
+    /* the row shows the hover; the title keeps its underline and does not invert */
+    .yf-list__item > a.yf-list__title:hover {
+      background: none;
+      color: inherit;
+    }
+  }
+
+  @container (min-width: 52rem) {
+    .yf-list__item {
+      grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr) auto;
+      column-gap: var(--yf-space-5);
+      align-items: baseline;
+    }
+
+    .yf-list__item:has(> .yf-list__num) {
+      grid-template-columns: 2rem minmax(12rem, 20rem) minmax(0, 1fr) auto;
+    }
+
+    .yf-list__item > :not(.yf-list__num, .yf-list__title) {
+      grid-column: auto;
+    }
+
+    .yf-list__item:not(:has(> .yf-list__text)) > .yf-list__meta {
+      grid-column: -2;
+    }
+
+    .yf-list__meta {
+      justify-content: flex-end;
+    }
+  }
+
+  /* ---------- disclosure ----------
+     <details class="yf-disclosure">
+       <summary>What the prompt assumes</summary>
+       <div class="yf-disclosure__body">...</div>
+     </details>
+     A ruled row with a chevron that turns when open. Disclosures in a row share their
+     rules. Opening eases the height where the browser can animate to auto. */
+
+  .yf-disclosure {
+    border-bottom: var(--yf-border);
+  }
+
+  :not(.yf-disclosure) + .yf-disclosure,
+  .yf-disclosure:first-child {
+    border-top: var(--yf-border);
+  }
+
+  .yf-disclosure > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-3);
+    min-block-size: var(--yf-control-h);
+    padding: var(--yf-space-2) var(--yf-space-1);
+    font-weight: var(--yf-weight-medium);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .yf-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* the chevron: two borders of a small square, turned */
+  .yf-disclosure > summary::before {
+    content: "";
+    flex: none;
+    inline-size: 0.45em;
+    block-size: 0.45em;
+    margin-inline: 0.15em 0.1em;
+    border-block-start: 1.5px solid currentColor;
+    border-inline-end: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .yf-disclosure[open] > summary::before {
+    transform: rotate(135deg);
+  }
+
+  .yf-disclosure > summary:dir(rtl)::before {
+    transform: rotate(-45deg);
+  }
+
+  .yf-disclosure[open] > summary:dir(rtl)::before {
+    transform: rotate(-135deg);
+  }
+
+  @media (any-hover: hover) {
+    .yf-disclosure > summary:hover {
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-disclosure > summary:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .yf-disclosure__body {
+    padding: var(--yf-space-1) var(--yf-space-1) var(--yf-space-4) calc(var(--yf-space-1) + 0.7em + var(--yf-space-3));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-disclosure > summary::before {
+      transition: transform var(--yf-dur) var(--yf-ease-out);
+    }
+
+    @supports selector(::details-content) {
+      .yf-disclosure {
+        interpolate-size: allow-keywords;
+      }
+
+      .yf-disclosure::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size var(--yf-dur) var(--yf-ease-out),
+          content-visibility var(--yf-dur) allow-discrete;
+      }
+
+      .yf-disclosure[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+
+  .yf-log--lg .yf-log__row {
+    padding: 0.95rem 0;
+  }
+
+  @media (max-width: 599.98px) {
+    .yf-log__row {
+      grid-template-columns: 4em minmax(0, 1fr);
+      column-gap: 1em;
+      padding: 0.7rem 0;
+    }
+
+    .yf-log__hash {
+      grid-area: 1 / 1;
+    }
+
+    .yf-log__date {
+      grid-area: 1 / 2;
+    }
+
+    .yf-log__type {
+      grid-area: 2 / 1;
+    }
+
+    .yf-log__title {
+      grid-area: 2 / 2;
+    }
+  }
+
+  /* ---------- stats callout ----------
+     <dl class="yf-stats-callout"><div><dt>42</dt><dd>findings closed</dd></div> ... </dl>
+     A big number over a small muted label, ruled like the tables: up to four columns in
+     a reading column, two on a phone. In rem, so it looks the same in prose and
+     elsewhere. (A dashboard row of stats is .yf-stats-row.) */
+
+  .yf-stats-callout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    margin: 2rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-stats-callout > div {
+    min-width: 0;
+    padding: 1.1rem 1rem 1.2rem 0;
+    border-top: 1px solid var(--yf-rule);
+  }
+
+  .yf-stats-callout dt {
+    font-size: clamp(2.25rem, 1.8rem + 1.6vw, 2.75rem);
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-display);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-stats-callout dd {
+    margin: 0.55rem 0 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  /* on a phone (two columns) an odd last stat takes the whole row, so its rule is as long as the others */
+  @media (max-width: 27.5rem) {
+    .yf-stats-callout > div:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ---------- pull quote ----------
+     <figure class="yf-quote">
+       <blockquote><p>Make the quiet part of the interface do the work.</p></blockquote>
+       <figcaption>Yoan Faure, <cite>Notes on ink</cite></figcaption>
+     </figure>
+     Larger and bolder than the prose quote, upright, with the same ink rule. A bare
+     <blockquote class="yf-quote"> with a <footer> works too. */
+
+  .yf-quote {
+    margin: 2.25rem 0;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--yf-fg);
+  }
+
+  .yf-quote blockquote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .yf-quote p {
+    margin: 0;
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 1.75rem);
+    font-style: normal;
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .yf-quote p + p {
+    margin-top: 0.6em;
+  }
+
+  .yf-quote :is(figcaption, footer) {
+    margin-top: 0.75rem;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-style: normal;
+    line-height: 1.5;
+  }
+
+  .yf-quote cite {
+    font-style: normal;
+  }
+
+  /* ---------- figure ----------
+     <figure class="yf-figure"><img ...><figcaption>Caption, one sentence.</figcaption></figure>
+     .yf-figure--framed puts a hairline around the picture (screenshots). */
+
+  .yf-figure,
+  .yf-prose figure {
+    margin: 2rem 0;
+  }
+
+  .yf-figure > :is(img, svg, picture, video, canvas),
+  .yf-prose figure > :is(img, svg, picture, video, canvas) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .yf-figure--framed > :is(img, svg, picture, video, canvas) {
+    border: 1px solid var(--yf-rule);
+  }
+
+  .yf-figure figcaption,
+  .yf-prose figure figcaption {
+    margin-top: 0.6rem;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+}
+/* States: empty, loading and error pages. The topographic field from yoanfaure.com
+   (yf.field, src/js/23-field.js) lives here and nowhere else in an app. It is a
+   watermark: the text on top gets a halo of the page colour, as on the site's home. */
+
+@layer yf.components {
+  /* ---------- the field host ----------
+     <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+     yf.field draws a canvas inside. The host fills its positioned parent (the state it
+     belongs to), or the viewport with .yf-topo--fixed. The cell font and ink colour are
+     read from this element's computed style, so the field says "mono" by itself. */
+
+  .yf-topo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    font-family: var(--yf-font-mono);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--yf-fg);
+    opacity: var(--yf-field-opacity, 0.9);
+    pointer-events: none;
+  }
+
+  .yf-topo--fixed {
+    position: fixed;
+  }
+
+  .yf-topo canvas,
+  canvas.yf-topo {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  canvas.yf-topo {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---------- the three states ---------- */
+
+  .yf-empty,
+  .yf-loading,
+  .yf-error-page {
+    --_halo: var(--yf-field-halo, var(--yf-bg));
+    position: relative;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+
+  /* what sits over the field: a soft halo, so a line of the field never cuts through a word.
+     A button or a link on hover is its own background, so it gets none. */
+  :is(.yf-empty__title, .yf-empty__text, .yf-loading__label, .yf-terminal) {
+    text-shadow:
+      0 0 0.25em var(--_halo),
+      0 0 0.5em var(--_halo),
+      0 0 0.5em var(--_halo);
+  }
+
+  .yf-terminal a:is(:hover, :focus-visible) {
+    text-shadow: none;
+  }
+
+  /* ---------- empty ----------
+     <section class="yf-empty">
+       <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+       <div class="yf-empty__body">
+         <h2 class="yf-empty__title">Run your first scan</h2>
+         <p class="yf-empty__text">Findings from the last run will show up here.</p>
+         <div class="yf-empty__action"><button class="yf-button yf-button--primary">Run scan</button></div>
+       </div>
+     </section>
+     The headline invites; it never apologises. .yf-empty--framed adds a hairline box. */
+
+  .yf-empty {
+    min-height: 18rem;
+    padding: var(--yf-space-7) var(--yf-space-5);
+    text-align: center;
+  }
+
+  .yf-empty--framed {
+    border: 1px solid var(--yf-rule);
+  }
+
+  .yf-empty__body {
+    position: relative;
+    z-index: 1;
+    max-width: 28rem;
+  }
+
+  .yf-empty__title {
+    margin: 0;
+    font-size: var(--yf-text-xl);
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .yf-empty__text {
+    margin: var(--yf-space-2) 0 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-base);
+    line-height: var(--yf-leading-normal);
+    text-wrap: balance;
+  }
+
+  .yf-empty__action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-space-2);
+    justify-content: center;
+    margin-top: var(--yf-space-5);
+  }
+
+  .yf-empty__action:empty {
+    display: none;
+  }
+
+  /* ---------- loading ----------
+     <div class="yf-loading" role="status" aria-busy="true">
+       <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+       <p class="yf-loading__label">Loading findings</p>
+     </div>
+     Set aria-busy="false" (or remove the element) when the content arrives. */
+
+  .yf-loading {
+    min-height: 10rem;
+    padding: var(--yf-space-6) var(--yf-space-5);
+  }
+
+  .yf-loading__label {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-sm);
+    font-variant-ligatures: none;
+    line-height: 1.4;
+  }
+
+  /* three dots that come and go, in steps (a clock, not a spinner) */
+  .yf-loading[aria-busy="true"] .yf-loading__label::after {
+    content: "...";
+    display: inline-block;
+    width: 3ch;
+    vertical-align: bottom;
+    overflow: hidden;
+    animation: yf-loading-dots 1.2s steps(4) infinite;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  @keyframes yf-loading-dots {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .yf-loading[aria-busy="true"] .yf-loading__label::after {
+      animation: none;
+      clip-path: none;
+    }
+  }
+
+  /* ---------- error page and terminal ----------
+     <main class="yf-error-page">
+       <div class="yf-topo yf-topo--fixed" data-yf-field aria-hidden="true"></div>
+       <div class="yf-error-page__body">
+         <h1 class="yf-error-page__title">Page not found</h1>
+         <pre class="yf-terminal">zsh: no such file or directory: /nope</pre>
+         <pre class="yf-terminal yf-terminal--prompt"><a href="/">cd ~</a></pre>
+       </div>
+     </main>
+     Like the site's 404: a shell line, then a prompt that goes home. The h1 is for
+     screen readers and the document outline; the terminal is what you see. */
+
+  .yf-error-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-content: start;
+    justify-items: stretch;
+    padding: clamp(3rem, 14vw, 9rem) var(--yf-gutter) var(--yf-space-7);
+  }
+
+  .yf-error-page__body {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--yf-measure);
+    margin-inline: auto;
+  }
+
+  .yf-error-page__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .yf-terminal {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--yf-fg);
+    font-family: var(--yf-font-mono);
+    font-size: clamp(0.95rem, 0.8rem + 0.8vw, 1.25rem);
+    font-variant-ligatures: none;
+    font-weight: var(--yf-weight-regular);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-terminal--prompt {
+    margin-top: 0.5rem;
+  }
+
+  .yf-terminal--prompt::before {
+    content: "% ";
+    color: var(--yf-muted);
+  }
+}
