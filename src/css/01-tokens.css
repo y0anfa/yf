@@ -1,0 +1,162 @@
+/* Tokens: the only place raw values live. Components read these and nothing else.
+   Light is the base. Dark applies when the system asks for it and no explicit
+   light theme is set, or when html[data-theme="dark"] forces it. */
+
+@layer yf.tokens {
+  @font-face {
+    font-family: "Inter";
+    src: url("fonts/InterVariable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Inter";
+    src: url("fonts/InterVariable-Italic.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    /* colour: ink on paper */
+    --yf-bg: #f4efe4;
+    --yf-fg: #262523;
+    --yf-muted: #6b675f;
+    --yf-rule: #ddd6c8;
+    --yf-sunk: #ece6d8;
+
+    /* colour: status only, never decoration or brand */
+    --yf-danger: #a12c1b;
+    --yf-danger-bg: #f1d9cf;
+    --yf-warning: #855700;
+    --yf-warning-bg: #efdfba;
+    --yf-success: #3d6b2a;
+    --yf-success-bg: #dbe5cc;
+
+    /* colour: interaction (ink, inverted) */
+    --yf-primary: var(--yf-fg);
+    --yf-on-primary: var(--yf-bg);
+    --yf-focus: var(--yf-fg);
+    --yf-hover: color-mix(in srgb, var(--yf-fg) 6%, transparent);
+    --yf-selected: color-mix(in srgb, var(--yf-fg) 11%, transparent);
+
+    /* colour: chart series, ink shades, each paired with a dash pattern. The
+       lightest stays above 3:1 against paper in both themes (52% is about 3.15:1
+       in light), so the patterns carry the rest of the difference. */
+    --yf-series-1: var(--yf-fg);
+    --yf-series-2: color-mix(in srgb, var(--yf-fg) 78%, var(--yf-bg));
+    --yf-series-3: color-mix(in srgb, var(--yf-fg) 62%, var(--yf-bg));
+    --yf-series-4: color-mix(in srgb, var(--yf-fg) 52%, var(--yf-bg));
+    --yf-dash-1: none;
+    --yf-dash-2: 6 3;
+    --yf-dash-3: 1.5 3;
+    --yf-dash-4: 8 3 1.5 3;
+
+    /* type */
+    --yf-font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --yf-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --yf-text-xs: 0.75rem;
+    --yf-text-sm: 0.875rem;
+    --yf-text-base: 1rem;
+    --yf-text-lg: 1.125rem;
+    --yf-text-xl: 1.375rem;
+    --yf-text-2xl: 1.75rem;
+    --yf-text-3xl: clamp(1.875rem, 1.3rem + 2.2vw, 2.5rem);
+    --yf-leading-tight: 1.15;
+    --yf-leading-normal: 1.6;
+    --yf-leading-prose: 1.7;
+    --yf-weight-regular: 400;
+    --yf-weight-medium: 600;
+    --yf-weight-bold: 700;
+    --yf-tracking-tight: -0.02em;
+    --yf-tracking-display: -0.03em;
+
+    /* space: one scale for gaps and padding */
+    --yf-space-1: 0.25rem;
+    --yf-space-2: 0.5rem;
+    --yf-space-3: 0.75rem;
+    --yf-space-4: 1rem;
+    --yf-space-5: 1.5rem;
+    --yf-space-6: 2rem;
+    --yf-space-7: 3rem;
+    --yf-space-8: 4rem;
+
+    /* shape: square layout, 3px on controls */
+    --yf-radius: 3px;
+    --yf-radius-layout: 0;
+    --yf-border: 1px solid var(--yf-rule);
+    --yf-border-strong: 1px solid var(--yf-fg);
+    /* the edge of an input or other control: 3:1 against paper in both themes
+       (the rule colour alone is a divider, too faint to outline a control) */
+    --yf-control-border: color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg));
+
+    /* sizes */
+    --yf-control-h: 2.25rem;
+    --yf-control-h-sm: 1.75rem;
+    --yf-measure: 38rem;
+    --yf-container: 72rem;
+    --yf-gutter: clamp(1rem, 4vw, 2.5rem);
+
+    /* overlays (dialog, menu, toast) are the only things that cast a shadow */
+    --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.08);
+
+    /* motion */
+    --yf-dur-fast: 120ms;
+    --yf-dur: 200ms;
+    --yf-dur-slow: 400ms;
+    --yf-ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --yf-ease-in: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+    /* stacking */
+    --yf-z-sticky: 20;
+    --yf-z-dropdown: 30;
+    --yf-z-overlay: 40;
+    --yf-z-toast: 50;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --yf-bg: #1e1d1b;
+      --yf-fg: #ece6d9;
+      --yf-muted: #9a958b;
+      --yf-rule: #34322f;
+      --yf-sunk: #262522;
+      --yf-danger: #ec8a74;
+      --yf-danger-bg: #3b2420;
+      --yf-warning: #dcab4f;
+      --yf-warning-bg: #3a2f1b;
+      --yf-success: #98c27c;
+      --yf-success-bg: #263221;
+      --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --yf-bg: #1e1d1b;
+    --yf-fg: #ece6d9;
+    --yf-muted: #9a958b;
+    --yf-rule: #34322f;
+    --yf-sunk: #262522;
+    --yf-danger: #ec8a74;
+    --yf-danger-bg: #3b2420;
+    --yf-warning: #dcab4f;
+    --yf-warning-bg: #3a2f1b;
+    --yf-success: #98c27c;
+    --yf-success-bg: #263221;
+    --yf-shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+    color-scheme: dark;
+  }
+}

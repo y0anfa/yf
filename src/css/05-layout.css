@@ -1,0 +1,254 @@
+/* Layout: boxes that place things. Spacing is always gap, never a margin between
+   siblings. Each primitive has a custom property for the one-off case, and presets for the
+   usual ones, since a strict CSP forbids setting a property in a style attribute. */
+
+/* registered, so the scroller's edge fade can animate them */
+@property --yf-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --yf-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@layer yf.layout {
+  /* ---------- page, container, column ----------
+     .yf-page       the room above and below a page's content; put it on the outer wrapper.
+     .yf-container  the app width, gutters on both sides (--yf-container sets the max).
+                    --narrow is 52rem, --wide 88rem (a table with many columns).
+     .yf-column     the reading measure, centred. Inside a container it needs no gutter. */
+
+  .yf-page {
+    padding-block: var(--yf-space-6) var(--yf-space-7);
+  }
+
+  .yf-container {
+    inline-size: min(100% - 2 * var(--yf-gutter), var(--yf-container, 72rem));
+    margin-inline: auto;
+  }
+
+  .yf-container--narrow {
+    --yf-container: 52rem;
+  }
+
+  .yf-container--wide {
+    --yf-container: 88rem;
+  }
+
+  .yf-column {
+    inline-size: min(100% - 2 * var(--yf-gutter), var(--yf-measure));
+    margin-inline: auto;
+  }
+
+  .yf-container .yf-column {
+    inline-size: min(100%, var(--yf-measure));
+  }
+
+  /* ---------- stack ----------
+     Children in a column, a gap between them. --yf-stack-gap overrides the gap.
+     A grid with one shrinkable track, so a wide table or <pre> scrolls
+     instead of pushing the stack wider than its parent. */
+
+  .yf-stack {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--yf-stack-gap, var(--yf-space-4));
+  }
+
+  .yf-stack--sm {
+    gap: var(--yf-space-2);
+  }
+
+  .yf-stack--lg {
+    gap: var(--yf-space-5);
+  }
+
+  .yf-stack--xl {
+    gap: var(--yf-space-7);
+  }
+
+  /* ---------- cluster ----------
+     Inline items that wrap: buttons, pills, tags, a toolbar. --yf-cluster-gap overrides the gap. */
+
+  .yf-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--yf-cluster-gap, var(--yf-space-3));
+  }
+
+  .yf-cluster--sm {
+    gap: var(--yf-space-2);
+  }
+
+  .yf-cluster--lg {
+    gap: var(--yf-space-5);
+  }
+
+  .yf-cluster--between {
+    justify-content: space-between;
+  }
+
+  .yf-cluster--end {
+    justify-content: flex-end;
+  }
+
+  .yf-cluster--start {
+    align-items: flex-start;
+  }
+
+  /* ---------- scroller ----------
+     One row that scrolls sideways instead of wrapping: chips on a phone, a long toolbar.
+     The scrollbar is hidden, so the edge with more to show fades out (where the browser
+     has scroll-driven animations; elsewhere the row just scrolls). Tab lists and the
+     stats row on a phone do the same. --yf-scroller-gap overrides the gap. */
+
+  .yf-scroller {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-scroller-gap, var(--yf-space-2));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .yf-scroller > * {
+    flex: none;
+  }
+
+  .yf-scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .yf-scroller {
+      mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      animation: yf-edge-fade linear both;
+      animation-timeline: scroll(self inline);
+    }
+
+    .yf-scroller:dir(rtl) {
+      mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+    }
+  }
+
+  /* an inactive timeline (nothing to scroll) leaves both at 0: no fade */
+  @keyframes yf-edge-fade {
+    0% {
+      --yf-fade-start: 0px;
+      --yf-fade-end: 1.5rem;
+    }
+
+    8%,
+    92% {
+      --yf-fade-start: 1.5rem;
+      --yf-fade-end: 1.5rem;
+    }
+
+    100% {
+      --yf-fade-start: 1.5rem;
+      --yf-fade-end: 0px;
+    }
+  }
+
+  /* ---------- grid ----------
+     As many columns as fit, none narrower than --yf-grid-min, sharing the width.
+     min() keeps one column from overflowing a narrow container. */
+
+  .yf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--yf-grid-min, 16rem), 100%), 1fr));
+    gap: var(--yf-grid-gap, var(--yf-space-5));
+  }
+
+  .yf-grid--sm {
+    --yf-grid-min: 10rem;
+  }
+
+  .yf-grid--lg {
+    --yf-grid-min: 24rem;
+  }
+
+  /* ---------- split ----------
+     Sidebar first, main second. They sit side by side while main keeps at least
+     half the width, and stack when it cannot. It reacts to its own width, not the
+     screen's, so it works inside a narrow panel too. --yf-split-side is the sidebar's width
+     (15rem); .yf-split--wide-side makes it 20rem. .yf-split--end puts the sidebar last. */
+
+  .yf-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-split-gap, var(--yf-space-6));
+  }
+
+  .yf-split > :first-child {
+    flex: 1 1 var(--yf-split-side, 15rem);
+  }
+
+  .yf-split > :last-child {
+    flex: 999 1 0;
+    min-inline-size: 50%;
+  }
+
+  .yf-split--wide-side {
+    --yf-split-side: 20rem;
+  }
+
+  .yf-split--end > :first-child {
+    flex: 999 1 0;
+    min-inline-size: 50%;
+  }
+
+  .yf-split--end > :last-child {
+    flex: 1 1 var(--yf-split-side, 15rem);
+    min-inline-size: 0;
+  }
+
+  /* ---------- divider ---------- */
+
+  .yf-divider {
+    block-size: 0;
+    border: 0;
+    border-block-start: var(--yf-border);
+  }
+
+  .yf-divider--strong {
+    border-block-start: var(--yf-border-strong);
+  }
+
+  .yf-divider--vertical {
+    inline-size: 0;
+    block-size: auto;
+    align-self: stretch;
+    border-block-start: 0;
+    border-inline-start: var(--yf-border);
+  }
+
+  /* ---------- skip link ----------
+     First focusable thing on the page; shows when it has focus. */
+
+  .yf-skip-link:not(:focus) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .yf-skip-link {
+    position: fixed;
+    inset-block-start: var(--yf-space-3);
+    inset-inline-start: var(--yf-gutter);
+    z-index: var(--yf-z-toast);
+    padding: var(--yf-space-1) var(--yf-space-3);
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+}

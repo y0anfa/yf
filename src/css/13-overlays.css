@@ -1,0 +1,392 @@
+/* Overlays: dialog, menu, tabs. Dialog and menu are the platform's own <dialog> and
+   popover, so Escape, focus return and the top layer come free. The three overlays
+   (these two and the toast) share one look: paper, a 1px ink edge, the overlay shadow. */
+
+@layer yf.components {
+  /* ---------- dialog ----------
+     <button class="yf-button" data-yf-dialog-open="confirm" command="show-modal" commandfor="confirm">Delete</button>
+     <dialog class="yf-dialog" id="confirm" aria-labelledby="confirm-title">
+       <div class="yf-dialog__header">
+         <h2 class="yf-dialog__title" id="confirm-title">Delete this report?</h2>
+         <button class="yf-button yf-button--ghost yf-button--close" data-yf-dialog-close aria-label="Close"></button>
+       </div>
+       <div class="yf-dialog__body">...</div>
+       <form class="yf-dialog__footer" method="dialog"> buttons; a submit closes it, with no JS </form>
+     </dialog>
+     Square, like the layout. Backdrop is a veil of the paper colour, so it dims the page
+     the same way in light and dark. --yf-dialog-width sets the width. */
+
+  .yf-dialog {
+    inline-size: min(var(--yf-dialog-width, 30rem), 100% - 2 * var(--yf-space-4));
+    max-inline-size: none;
+    max-block-size: calc(100vh - 2 * var(--yf-space-4));
+    max-block-size: calc(100dvh - 2 * var(--yf-space-4));
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius-layout);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+  }
+
+  .yf-dialog--wide {
+    --yf-dialog-width: 44rem;
+  }
+
+  .yf-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .yf-dialog::backdrop {
+    background: color-mix(in srgb, var(--yf-bg) 80%, transparent);
+  }
+
+  /* the page behind a modal does not scroll */
+  :root:has(.yf-dialog:modal) {
+    overflow: hidden;
+  }
+
+  .yf-dialog__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-2) var(--yf-space-2) var(--yf-space-2) var(--yf-space-5);
+    border-block-end: var(--yf-border);
+  }
+
+  .yf-dialog__title {
+    font-size: var(--yf-text-lg);
+  }
+
+  .yf-dialog__body {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    padding: var(--yf-space-5);
+    overflow-y: auto;
+  }
+
+  .yf-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--yf-space-2);
+    padding: var(--yf-space-4) var(--yf-space-5);
+    border-block-start: var(--yf-border);
+  }
+
+  /* ---------- menu ----------
+     <button class="yf-button" popovertarget="actions">Actions</button>
+     <div class="yf-menu" id="actions" popover aria-label="Actions">
+       <button class="yf-menu__item">Rename</button>
+       <div class="yf-menu__separator"></div>
+       <button class="yf-menu__item yf-menu__item--danger">Delete</button>
+     </div>
+     Opens under its trigger through CSS anchor positioning and flips when it would leave
+     the screen. Where that is not supported, 14-menu.js places it. Without JS it still
+     opens and closes (popovertarget) and the items are buttons; the script adds the menu
+     roles together with the arrow keys that go with them. */
+
+  .yf-menu {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    min-inline-size: var(--yf-menu-min, 12rem);
+    max-inline-size: calc(100% - 2 * var(--yf-space-4));
+    max-block-size: calc(100vh - 2 * var(--yf-space-4));
+    max-block-size: calc(100dvh - 2 * var(--yf-space-4));
+    padding: var(--yf-space-1);
+    overflow: auto;
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+  }
+
+  /* The column lives on the menu itself, not only while open: a closing menu keeps
+     display: flex until its fade ends, and must not lay its items out in a row meanwhile. */
+  .yf-menu {
+    flex-direction: column;
+  }
+
+  .yf-menu:popover-open {
+    display: flex;
+  }
+
+  @supports (position-area: block-end) {
+    .yf-menu {
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+      margin-block: var(--yf-space-1);
+    }
+  }
+
+  .yf-menu__item {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-2);
+    inline-size: 100%;
+    min-block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-3);
+    border: 0;
+    border-radius: var(--yf-radius);
+    background: transparent;
+    color: var(--yf-fg);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    text-align: start;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .yf-menu__item > .yf-icon {
+    flex: none;
+  }
+
+  /* the key is the focus mark here: the row inverts, as links do, so no ring is needed */
+  .yf-menu__item:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+    outline: 0;
+  }
+
+  @media (any-hover: hover) {
+    .yf-menu__item:hover {
+      background: var(--yf-hover);
+    }
+
+    .yf-menu__item:focus-visible:hover {
+      background: var(--yf-fg);
+    }
+  }
+
+  .yf-menu__item:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-menu__item--danger {
+    color: var(--yf-danger);
+  }
+
+  @media (any-hover: hover) {
+    .yf-menu__item--danger:hover {
+      background: var(--yf-danger-bg);
+    }
+
+    .yf-menu__item--danger:focus-visible:hover {
+      background: var(--yf-danger);
+    }
+  }
+
+  .yf-menu__item--danger:focus-visible {
+    background: var(--yf-danger);
+    color: var(--yf-bg);
+  }
+
+  .yf-menu__item:is(:disabled, [aria-disabled="true"]) {
+    background: transparent;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  .yf-menu__shortcut {
+    margin-inline-start: auto;
+    padding-inline-start: var(--yf-space-4);
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-menu__item:focus-visible > .yf-menu__shortcut {
+    color: inherit;
+  }
+
+  .yf-menu__label {
+    padding: var(--yf-space-2) var(--yf-space-3) var(--yf-space-1);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-menu__separator {
+    block-size: 1px;
+    margin-block: var(--yf-space-1);
+    border: 0;
+    background: var(--yf-rule);
+  }
+
+  /* ---------- tabs ----------
+     <div class="yf-tabs" data-yf-tabs>
+       <div role="tablist" aria-label="Report">
+         <button role="tab" id="t-a" aria-controls="p-a" aria-selected="true">Summary</button>
+         <button role="tab" id="t-b" aria-controls="p-b" aria-selected="false" tabindex="-1">Findings</button>
+       </div>
+       <div role="tabpanel" id="p-a" aria-labelledby="t-a" tabindex="0">...</div>
+       <div role="tabpanel" id="p-b" aria-labelledby="t-b" tabindex="0" hidden>...</div>
+     </div>
+     The active tab has a 2px ink underline on the list's hairline; the label stays
+     600 for all, so nothing moves when the selection does. The list scrolls sideways
+     on a narrow screen, its far edge fading while there is more (as .yf-scroller does).
+     A count goes after the label: Open <span class="yf-count">12</span>.
+     Tabs need the script (13-tabs.js) to switch. */
+
+  .yf-tabs > [role="tablist"] {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    background-image: linear-gradient(var(--yf-rule), var(--yf-rule));
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 100% 1px;
+  }
+
+  .yf-tabs > [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .yf-tabs > [role="tablist"] {
+      mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      animation: yf-edge-fade linear both;
+      animation-timeline: scroll(self inline);
+    }
+
+    .yf-tabs > [role="tablist"]:dir(rtl) {
+      mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+    }
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"] {
+    position: relative;
+    flex: none;
+    block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-4);
+    border: 0;
+    background: none;
+    color: var(--yf-muted);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--yf-space-4);
+    inset-block-end: 0;
+    block-size: 2px;
+    background: var(--yf-fg);
+    transform: scaleX(0);
+  }
+
+  @media (any-hover: hover) {
+    .yf-tabs > [role="tablist"] > [role="tab"]:hover {
+      color: var(--yf-fg);
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"][aria-selected="true"] {
+    color: var(--yf-fg);
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"] > .yf-count {
+    margin-inline-start: var(--yf-space-1);
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"][aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  /* the ring goes inside the tab: the list scrolls, and a ring outside would be cut off */
+  .yf-tabs > [role="tablist"] > [role="tab"]:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .yf-tabs > [role="tablist"] > [role="tab"]:is(:disabled, [aria-disabled="true"]) {
+    background: none;
+    color: color-mix(in srgb, var(--yf-muted) 55%, var(--yf-bg));
+    cursor: not-allowed;
+  }
+
+  .yf-tabs > [role="tabpanel"] {
+    padding-block-start: var(--yf-space-5);
+  }
+
+  /* ---------- motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-dialog,
+    .yf-dialog::backdrop {
+      opacity: 0;
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-in),
+        translate var(--yf-dur-fast) var(--yf-ease-in),
+        overlay var(--yf-dur-fast) allow-discrete,
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    .yf-dialog {
+      translate: 0 var(--yf-space-2);
+    }
+
+    .yf-dialog[open],
+    .yf-dialog[open]::backdrop {
+      opacity: 1;
+      transition-duration: var(--yf-dur);
+      transition-timing-function: var(--yf-ease-out);
+    }
+
+    .yf-dialog[open] {
+      translate: 0 0;
+    }
+
+    @starting-style {
+      .yf-dialog[open],
+      .yf-dialog[open]::backdrop {
+        opacity: 0;
+      }
+
+      .yf-dialog[open] {
+        translate: 0 var(--yf-space-2);
+      }
+    }
+
+    .yf-menu {
+      opacity: 0;
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-in),
+        overlay var(--yf-dur-fast) allow-discrete,
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    .yf-menu:popover-open {
+      opacity: 1;
+      transition-timing-function: var(--yf-ease-out);
+    }
+
+    @starting-style {
+      .yf-menu:popover-open {
+        opacity: 0;
+      }
+    }
+
+    .yf-tabs > [role="tablist"] > [role="tab"] {
+      transition:
+        color var(--yf-dur-fast) var(--yf-ease-out),
+        background-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-tabs > [role="tablist"] > [role="tab"]::after {
+      transition: transform var(--yf-dur) var(--yf-ease-out);
+    }
+  }
+}

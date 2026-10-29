@@ -1,0 +1,230 @@
+/* States: empty, loading and error pages. The topographic field from yoanfaure.com
+   (yf.field, src/js/23-field.js) lives here and nowhere else in an app. It is a
+   watermark: the text on top gets a halo of the page colour, as on the site's home. */
+
+@layer yf.components {
+  /* ---------- the field host ----------
+     <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+     yf.field draws a canvas inside. The host fills its positioned parent (the state it
+     belongs to), or the viewport with .yf-topo--fixed. The cell font and ink colour are
+     read from this element's computed style, so the field says "mono" by itself. */
+
+  .yf-topo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    font-family: var(--yf-font-mono);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--yf-fg);
+    opacity: var(--yf-field-opacity, 0.9);
+    pointer-events: none;
+  }
+
+  .yf-topo--fixed {
+    position: fixed;
+  }
+
+  .yf-topo canvas,
+  canvas.yf-topo {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  canvas.yf-topo {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---------- the three states ---------- */
+
+  .yf-empty,
+  .yf-loading,
+  .yf-error-page {
+    --_halo: var(--yf-field-halo, var(--yf-bg));
+    position: relative;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+
+  /* what sits over the field: a soft halo, so a line of the field never cuts through a word.
+     A button or a link on hover is its own background, so it gets none. */
+  :is(.yf-empty__title, .yf-empty__text, .yf-loading__label, .yf-terminal) {
+    text-shadow:
+      0 0 0.25em var(--_halo),
+      0 0 0.5em var(--_halo),
+      0 0 0.5em var(--_halo);
+  }
+
+  .yf-terminal a:is(:hover, :focus-visible) {
+    text-shadow: none;
+  }
+
+  /* ---------- empty ----------
+     <section class="yf-empty">
+       <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+       <div class="yf-empty__body">
+         <h2 class="yf-empty__title">Run your first scan</h2>
+         <p class="yf-empty__text">Findings from the last run will show up here.</p>
+         <div class="yf-empty__action"><button class="yf-button yf-button--primary">Run scan</button></div>
+       </div>
+     </section>
+     The headline invites; it never apologises. .yf-empty--framed adds a hairline box. */
+
+  .yf-empty {
+    min-height: 18rem;
+    padding: var(--yf-space-7) var(--yf-space-5);
+    text-align: center;
+  }
+
+  .yf-empty--framed {
+    border: 1px solid var(--yf-rule);
+  }
+
+  .yf-empty__body {
+    position: relative;
+    z-index: 1;
+    max-width: 28rem;
+  }
+
+  .yf-empty__title {
+    margin: 0;
+    font-size: var(--yf-text-xl);
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .yf-empty__text {
+    margin: var(--yf-space-2) 0 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-base);
+    line-height: var(--yf-leading-normal);
+    text-wrap: balance;
+  }
+
+  .yf-empty__action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-space-2);
+    justify-content: center;
+    margin-top: var(--yf-space-5);
+  }
+
+  .yf-empty__action:empty {
+    display: none;
+  }
+
+  /* ---------- loading ----------
+     <div class="yf-loading" role="status" aria-busy="true">
+       <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+       <p class="yf-loading__label">Loading findings</p>
+     </div>
+     Set aria-busy="false" (or remove the element) when the content arrives. */
+
+  .yf-loading {
+    min-height: 10rem;
+    padding: var(--yf-space-6) var(--yf-space-5);
+  }
+
+  .yf-loading__label {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-sm);
+    font-variant-ligatures: none;
+    line-height: 1.4;
+  }
+
+  /* three dots that come and go, in steps (a clock, not a spinner) */
+  .yf-loading[aria-busy="true"] .yf-loading__label::after {
+    content: "...";
+    display: inline-block;
+    width: 3ch;
+    vertical-align: bottom;
+    overflow: hidden;
+    animation: yf-loading-dots 1.2s steps(4) infinite;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  @keyframes yf-loading-dots {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .yf-loading[aria-busy="true"] .yf-loading__label::after {
+      animation: none;
+      clip-path: none;
+    }
+  }
+
+  /* ---------- error page and terminal ----------
+     <main class="yf-error-page">
+       <div class="yf-topo yf-topo--fixed" data-yf-field aria-hidden="true"></div>
+       <div class="yf-error-page__body">
+         <h1 class="yf-error-page__title">Page not found</h1>
+         <pre class="yf-terminal">zsh: no such file or directory: /nope</pre>
+         <pre class="yf-terminal yf-terminal--prompt"><a href="/">cd ~</a></pre>
+       </div>
+     </main>
+     Like the site's 404: a shell line, then a prompt that goes home. The h1 is for
+     screen readers and the document outline; the terminal is what you see. */
+
+  .yf-error-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-content: start;
+    justify-items: stretch;
+    padding: clamp(3rem, 14vw, 9rem) var(--yf-gutter) var(--yf-space-7);
+  }
+
+  .yf-error-page__body {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--yf-measure);
+    margin-inline: auto;
+  }
+
+  .yf-error-page__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .yf-terminal {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--yf-fg);
+    font-family: var(--yf-font-mono);
+    font-size: clamp(0.95rem, 0.8rem + 0.8vw, 1.25rem);
+    font-variant-ligatures: none;
+    font-weight: var(--yf-weight-regular);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-terminal--prompt {
+    margin-top: 0.5rem;
+  }
+
+  .yf-terminal--prompt::before {
+    content: "% ";
+    color: var(--yf-muted);
+  }
+}

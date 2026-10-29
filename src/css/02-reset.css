@@ -1,0 +1,64 @@
+/* Reset: small and modern. Box model, zero margins (spacing comes from gap in
+   .yf-stack and friends), media defaults, form font inheritance, [hidden]. */
+
+@layer yf.reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* dialog and popover centre themselves with `margin: auto`; leave that alone */
+  *:not(dialog, [popover]) {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  img,
+  picture,
+  video,
+  canvas {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  img,
+  video {
+    block-size: auto;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* A fieldset is as wide as its content by default, and a field would not shrink in a
+     flex row. Set here, under the layout layer, so a .yf-split side still keeps its half. */
+  fieldset,
+  .yf-field {
+    min-inline-size: 0;
+  }
+
+  /* !important, so no display rule in a later layer can bring a hidden element back */
+  [hidden]:not([hidden="until-found"]) {
+    display: none !important;
+  }
+}

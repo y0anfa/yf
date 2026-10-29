@@ -1,0 +1,99 @@
+#!/bin/sh
+# Serves dist/site on http://127.0.0.1:PORT (default 4300) for local preview.
+#
+# usage: scripts/serve [port]      (scripts/build --serve [port] builds first)
+#
+# It is python3's http.server with two additions, so the preview behaves like the deploy:
+#   - it applies the rules in dist/site/_headers, so a Content Security Policy violation
+#     shows in the browser console here exactly as it would in production (Cache-Control
+#     is the exception: it is always no-cache here, so a rebuilt release shows at once);
+#   - an unknown path gets dist/site/404.html with a 404 status.
+# Stop it with Ctrl-C.
+set -eu
+cd "$(dirname "$0")/.."
+
+port=${1:-4300}
+case $port in
+  '' | *[!0-9]*)
+    echo "serve: port must be a number, not '$port'" >&2
+    exit 2
+    ;;
+esac
+[ -f dist/site/index.html ] || {
+  echo "serve: dist/site is not built. Run scripts/build first." >&2
+  exit 1
+}
+command -v python3 > /dev/null 2>&1 || {
+  echo "serve: python3 is needed to serve the preview." >&2
+  exit 1
+}
+
+echo "serving dist/site at http://127.0.0.1:$port/ (Ctrl-C to stop)"
+exec python3 -I - "dist/site" "$port" << 'PY'
+import http.server
+import os
+import re
+import sys
+
+root, port = os.path.abspath(sys.argv[1]), int(sys.argv[2])
+
+
+def load_rules(path):
+    """The _headers file: a path or pattern on its own line, indented headers under it."""
+    rules, current = [], None
+    try:
+        lines = open(path, encoding="utf-8").read().splitlines()
+    except OSError:
+        return rules
+    for line in lines:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if not line[0].isspace():
+            pattern = "^" + re.escape(line.strip()).replace(r"\*", ".*") + "$"
+            current = (re.compile(pattern), [])
+            rules.append(current)
+        elif current is not None and ":" in line:
+            name, value = line.strip().split(":", 1)
+            current[1].append((name.strip(), value.strip()))
+    return rules
+
+
+RULES = load_rules(os.path.join(root, "_headers"))
+PAGE_404 = os.path.join(root, "404.html")
+
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=root, **kwargs)
+
+    def end_headers(self):
+        path = self.path.split("?", 1)[0].split("#", 1)[0]
+        for pattern, headers in RULES:
+            if pattern.match(path):
+                for name, value in headers:
+                    if name.lower() != "cache-control":
+                        self.send_header(name, value)
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
+
+    def send_error(self, code, message=None, explain=None):
+        if code == 404 and os.path.isfile(PAGE_404):
+            with open(PAGE_404, "rb") as f:
+                body = f.read()
+            self.send_response(404)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if self.command != "HEAD":
+                self.wfile.write(body)
+        else:
+            super().send_error(code, message, explain)
+
+
+try:
+    http.server.ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+except KeyboardInterrupt:
+    print()
+except OSError as e:
+    sys.exit("serve: cannot listen on 127.0.0.1:%d (%s)" % (port, e.strerror))
+PY

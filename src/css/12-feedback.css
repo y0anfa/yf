@@ -1,0 +1,340 @@
+/* Feedback: toast, banner, tooltip. Status colour shows on the mark and the rule
+   only; the words stay ink. A status is always a mark plus words, never colour alone. */
+
+@layer yf.components {
+  /* ---------- toast ----------
+     <div class="yf-toaster" aria-live="polite"> (yf.toast() makes it for you)
+       <div class="yf-toast yf-toast--success">
+         <span class="yf-toast__icon" aria-hidden="true"></span>
+         <div class="yf-toast__body"><p class="yf-toast__message">Report saved.</p></div>
+         <button class="yf-link yf-toast__action" type="button">Undo</button>
+         <button class="yf-button yf-button--ghost yf-button--close yf-toast__dismiss" type="button" aria-label="Dismiss"></button>
+       </div>
+     </div>
+     Bottom right on a desktop, the full width at the bottom on a phone. yf.toast makes the
+     region a manual popover (so it can sit above a modal dialog); the rule below also takes
+     back the popover's own look: centred, bordered, padded, filled. */
+
+  .yf-toaster {
+    position: fixed;
+    inset: auto;
+    inset-block-end: var(--yf-space-4);
+    inset-inline-end: var(--yf-space-4);
+    z-index: var(--yf-z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--yf-space-2);
+    inline-size: min(var(--yf-toast-width, 26rem), 100% - 2 * var(--yf-space-4));
+    block-size: auto;
+    margin: 0;
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
+    overflow: visible;
+    border: 0;
+    background: none;
+    color: inherit;
+    pointer-events: none;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-toaster {
+      inset-inline: var(--yf-space-3);
+      inset-block-end: var(--yf-space-3);
+      inline-size: auto;
+    }
+
+    /* an open dialog keeps its buttons at the bottom, so its toasts come from the top,
+       newest nearest the edge */
+    dialog > .yf-toaster {
+      inset-block: calc(var(--yf-space-3) + env(safe-area-inset-top, 0px)) auto;
+      flex-direction: column-reverse;
+      padding: 0;
+    }
+
+    dialog > .yf-toaster > .yf-toast {
+      --_shift: calc(-1 * var(--yf-space-2));
+    }
+  }
+
+  .yf-toast {
+    --_status: var(--yf-fg);
+
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-2) var(--yf-space-2) var(--yf-space-2) var(--yf-space-4);
+    border: var(--yf-border-strong);
+    border-radius: var(--yf-radius);
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    box-shadow: var(--yf-shadow-overlay);
+    font-size: var(--yf-text-sm);
+    pointer-events: auto;
+  }
+
+  .yf-toast__body {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .yf-toast__message {
+    overflow-wrap: anywhere;
+  }
+
+  .yf-toast__action {
+    flex: none;
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+  }
+
+  .yf-toast__dismiss {
+    flex: none;
+  }
+
+  /* ---------- banner ----------
+     <div class="yf-banner yf-banner--danger" role="alert">
+       <span class="yf-banner__icon" aria-hidden="true"></span>
+       <div class="yf-banner__body">
+         <p class="yf-banner__title">Scan failed</p>
+         <p>The repository could not be reached.</p>
+       </div>
+     </div>
+     Quiet on purpose: a sunk panel with a 4px rule in the status colour and the mark. No
+     tinted fill, so a page of banners stays ink on paper. Square, like the rest of the layout.
+     No modifier is the neutral note (ink); --info says the same thing out loud. */
+
+  .yf-banner {
+    --_status: var(--yf-fg);
+
+    display: flex;
+    align-items: baseline;
+    gap: var(--yf-space-3);
+    padding: var(--yf-space-3) var(--yf-space-4);
+    border: var(--yf-border);
+    border-inline-start: var(--yf-space-1) solid var(--_status);
+    background: var(--yf-sunk);
+    color: var(--yf-fg);
+    font-size: var(--yf-text-sm);
+  }
+
+  /* the mark sits on the middle of the first line: the line is the banner's, not the mark's */
+  .yf-banner__icon {
+    align-self: flex-start;
+    margin-block-start: calc((var(--yf-text-sm) * var(--yf-leading-normal) - var(--_mark)) / 2);
+  }
+
+  .yf-banner__body {
+    flex: 1 1 auto;
+    display: grid;
+    gap: var(--yf-space-1);
+    min-inline-size: 0;
+  }
+
+  .yf-banner__title {
+    font-weight: var(--yf-weight-medium);
+  }
+
+  /* ---------- status mark ----------
+     The small square at the start of a toast or banner. It draws its own glyph, so it
+     needs no sprite: i (info), a tick (success), ! in a triangle (warning), ! (danger).
+     Keep the span empty (no whitespace) to get the glyph, or put an
+     <svg class="yf-icon"> in it to use an icon instead. */
+
+  .yf-toast__icon,
+  .yf-banner__icon {
+    --_mark: var(--yf-text-lg);
+
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--_mark);
+    block-size: var(--_mark);
+    border-radius: var(--yf-radius);
+    background: var(--_status);
+    color: var(--yf-bg);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-bold);
+    line-height: 1;
+    user-select: none;
+  }
+
+  :is(.yf-toast__icon, .yf-banner__icon) > .yf-icon {
+    inline-size: var(--yf-text-sm);
+    block-size: var(--yf-text-sm);
+  }
+
+  /* the mark is aria-hidden, so its glyph needs no empty alt text (and a var() beside the
+     alt syntax would blank the glyph in a browser that lacks it) */
+  :is(.yf-toast__icon, .yf-banner__icon):empty::before {
+    content: var(--_glyph, "i");
+  }
+
+  .yf-toast--success,
+  .yf-banner--success {
+    --_status: var(--yf-success);
+  }
+
+  .yf-toast--warning,
+  .yf-banner--warning {
+    --_status: var(--yf-warning);
+    --_glyph: "!";
+  }
+
+  .yf-toast--danger,
+  .yf-banner--danger {
+    --_status: var(--yf-danger);
+    --_glyph: "!";
+  }
+
+  :is(.yf-toast--success, .yf-banner--success) :is(.yf-toast__icon, .yf-banner__icon):empty::before {
+    content: "";
+    inline-size: calc(var(--_mark) * 0.62);
+    block-size: calc(var(--_mark) * 0.62);
+    background: var(--yf-bg);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+  }
+
+  :is(.yf-toast--warning, .yf-banner--warning) :is(.yf-toast__icon, .yf-banner__icon) {
+    padding-block-start: 0.2em;
+    border-radius: 0;
+    clip-path: polygon(50% 4%, 100% 94%, 0 94%);
+  }
+
+  /* ---------- tooltip ----------
+     <button class="yf-button yf-button--icon" aria-label="Copy" data-yf-tooltip="Copy">
+     CSS only: the text lives in ::after, taken from the attribute, and shows on hover and
+     keyboard focus. It is supplementary: the trigger must already have its own name
+     (aria-label or visible text), and the generated text is kept out of the accessible
+     name. yf.tooltip (15-tooltip.js) adds Escape to dismiss it, as WCAG 1.4.13 asks,
+     and exposes it as the description. Elements that cannot have a ::after (input, img,
+     svg) need a wrapper. Placement: data-yf-tooltip-pos="top|bottom|left|right". */
+
+  [data-yf-tooltip] {
+    position: relative;
+  }
+
+  [data-yf-tooltip]::after {
+    content: attr(data-yf-tooltip);
+    content: attr(data-yf-tooltip) / "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: 50%;
+    z-index: var(--yf-z-dropdown);
+    translate: -50% 0;
+    inline-size: max-content;
+    max-inline-size: var(--yf-tooltip-max, 16rem);
+    padding: var(--yf-space-1) var(--yf-space-2);
+    /* a transparent border bridges the gap, so the pointer can reach the tip without losing the hover */
+    border-block-end: var(--yf-space-1) solid transparent;
+    border-radius: var(--yf-radius);
+    background: var(--yf-fg);
+    background-clip: padding-box;
+    color: var(--yf-bg);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-xs);
+    font-style: normal;
+    font-weight: var(--yf-weight-regular);
+    letter-spacing: normal;
+    line-height: var(--yf-leading-normal);
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    white-space: normal;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    /* display none while hidden: an invisible tip still counts as scrollable overflow,
+       and one at the right edge of the page would give it a horizontal scrollbar */
+    display: none;
+  }
+
+  [data-yf-tooltip-pos="bottom"]::after {
+    inset-block: 100% auto;
+    border-block: var(--yf-space-1) solid transparent;
+    border-block-end: 0;
+  }
+
+  [data-yf-tooltip-pos="left"]::after {
+    inset-block: 50% auto;
+    inset-inline: auto 100%;
+    translate: 0 -50%;
+    border-block-end: 0;
+    border-inline-end: var(--yf-space-1) solid transparent;
+  }
+
+  [data-yf-tooltip-pos="right"]::after {
+    inset-block: 50% auto;
+    inset-inline: 100% auto;
+    translate: 0 -50%;
+    border-block-end: 0;
+    border-inline-start: var(--yf-space-1) solid transparent;
+  }
+
+  [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (any-hover: hover) {
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  /* ---------- motion ---------- */
+
+  @keyframes yf-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--_shift, var(--yf-space-2)));
+    }
+  }
+
+  @keyframes yf-toast-out {
+    to {
+      opacity: 0;
+      transform: translateY(var(--yf-space-1));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-toast {
+      animation: yf-toast-in var(--yf-dur) var(--yf-ease-out);
+    }
+
+    .yf-toast[data-leaving] {
+      animation: yf-toast-out var(--yf-dur-fast) var(--yf-ease-in) forwards;
+    }
+
+    /* the tip leaves at once and arrives after a beat of intent */
+    [data-yf-tooltip]::after {
+      transition:
+        opacity var(--yf-dur-fast) var(--yf-ease-out),
+        display var(--yf-dur-fast) allow-discrete;
+    }
+
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+      transition-delay: 0s;
+    }
+
+    @starting-style {
+      [data-yf-tooltip]:not([data-yf-tooltip-off]):is(:focus-visible, :has(:focus-visible))::after {
+        opacity: 0;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (any-hover: hover) {
+    [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+      transition-delay: var(--yf-dur);
+    }
+
+    @starting-style {
+      [data-yf-tooltip]:not([data-yf-tooltip-off]):hover::after {
+        opacity: 0;
+      }
+    }
+  }
+}

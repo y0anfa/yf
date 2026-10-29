@@ -1,0 +1,996 @@
+/* Data: icons, table, status pill, stat, key-value list, progress, meter, code block,
+   sparkline and chart helpers. Tokens only. Every JS-driven part also reads right
+   without JS (the sparkline falls back to its host text, sorting to plain headers). */
+
+@layer yf.components {
+  /* ---------- icons ----------
+     <svg class="yf-icon" aria-hidden="true"><use href="icons/yf-icons.svg#check"/></svg>
+     Sized by CSS (the sprite has no width or height), coloured by currentColor.
+     An icon with no visible text next to it needs role="img" and an aria-label. */
+
+  .yf-icon {
+    display: inline-block;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+    vertical-align: -0.125em;
+  }
+
+  .yf-icon--sm {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .yf-icon--lg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .yf-icon--xl {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* hides a sprite that is pasted into the page instead of loaded from a file */
+  .yf-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* ---------- table ----------
+     <div class="yf-table-wrap" tabindex="0" role="region" aria-label="Findings">
+       <table class="yf-table" data-yf-sortable> ... </table>
+     </div>
+     Ruled, no boxes. Cells carry 12px of side padding so a hover or selected fill
+     never hugs the text; the rules run edge to edge. */
+
+  .yf-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .yf-table-wrap:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  /* a sticky header needs something to stick to: the wrap scrolls vertically too.
+     Override the height with --yf-table-max-h on the wrap; .yf-table-wrap--tall is 40rem. */
+  .yf-table-wrap:has(.yf-table--sticky) {
+    max-height: var(--yf-table-max-h, 28rem);
+    overflow-y: auto;
+  }
+
+  .yf-table-wrap--tall {
+    --yf-table-max-h: 40rem;
+  }
+
+  .yf-table {
+    width: 100%;
+    /* separate, not collapsed: borders on collapsed cells do not travel with a sticky header */
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--yf-fg);
+    font-size: var(--yf-text-sm);
+    line-height: 1.45;
+    text-align: left;
+  }
+
+  .yf-table caption {
+    padding: 0 var(--yf-space-3) var(--yf-space-2);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    text-align: left;
+    caption-side: top;
+  }
+
+  .yf-table :is(th, td) {
+    padding: 0.625rem var(--yf-space-3);
+    border-bottom: 1px solid var(--yf-rule);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .yf-table thead th {
+    padding-block: var(--yf-space-2);
+    border-bottom: 1px solid var(--yf-fg);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    white-space: nowrap;
+  }
+
+  /* a row header reads as the row's name */
+  .yf-table tbody th {
+    color: var(--yf-fg);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  /* numbers: right-aligned, tabular. .yf-num is the same switch outside tables. */
+  .yf-table :is(th, td):is(.yf-num, [data-type="number"]) {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* ids, hashes, paths: mono, one line */
+  .yf-table :is(th, td):is(.yf-mono, [data-type="mono"]) {
+    font-family: var(--yf-font-mono);
+    font-size: 0.8125rem;
+    font-variant-ligatures: none;
+    white-space: nowrap;
+  }
+
+  .yf-table td:has(> .yf-status) {
+    white-space: nowrap;
+  }
+
+  /* Text never squeezes under a word or two: on a narrow screen the wrap scrolls instead.
+     A cell with a data-type (number, mono, or the page's own: a pill, the actions) sizes to
+     its content. --yf-cell-min on a cell (or a column's cells) changes the minimum, 0 lets it
+     shrink, and .yf-wide on the cells of the column that carries the sentence keeps 14rem. */
+  .yf-table td:not(:is(.yf-num, .yf-mono, [data-type])) {
+    min-width: var(--yf-cell-min, 7rem);
+  }
+
+  .yf-table td.yf-wide {
+    --yf-cell-min: 14rem;
+  }
+
+  .yf-table tbody tr {
+    transition: background-color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  @media (hover: hover) {
+    .yf-table tbody tr:hover {
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-table tbody tr:is([aria-selected="true"], .is-selected) {
+    background: var(--yf-selected);
+  }
+
+  /* muted text on the hover and selected fills drops under 4.5:1, so inside those rows it
+     steps up toward ink (it is still lighter than the text around it) */
+  .yf-table tbody tr:is([aria-selected="true"], .is-selected) {
+    --yf-muted: color-mix(in srgb, var(--yf-fg) 80%, var(--yf-bg));
+  }
+
+  @media (hover: hover) {
+    .yf-table tbody tr:hover {
+      --yf-muted: color-mix(in srgb, var(--yf-fg) 80%, var(--yf-bg));
+    }
+  }
+
+  /* sticky header: sticks to the wrap. The paper behind it is opaque. */
+  .yf-table--sticky thead th {
+    position: sticky;
+    top: -1px; /* not 0: a wrap at a fractional offset would show a hairline of the rows above the header */
+    z-index: var(--yf-z-sticky);
+    background: var(--yf-table-bg, var(--yf-bg));
+  }
+
+  /* sortable headers: <th aria-sort="none"><button type="button">Name</button></th>.
+     yf.table adds the button when a th[aria-sort] has none. */
+  .yf-table th[aria-sort] > button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yf-space-2);
+    margin: -0.25rem -0.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: var(--yf-radius);
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    transition: background-color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  .yf-table th[aria-sort] > button:hover {
+    background: var(--yf-hover);
+    color: var(--yf-fg);
+  }
+
+  .yf-table th[aria-sort] > button:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-table th[aria-sort] > button:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 0;
+  }
+
+  .yf-table th[aria-sort]:is([aria-sort="ascending"], [aria-sort="descending"]) {
+    color: var(--yf-fg);
+  }
+
+  /* the indicator: both arrows, dim, when unsorted; one arrow, solid, when sorted */
+  .yf-table th[aria-sort] > button::after {
+    content: "";
+    flex: none;
+    width: 0.5rem;
+    height: 0.75rem;
+    background: currentColor;
+    opacity: 0.45;
+    clip-path: polygon(0 42%, 50% 8%, 100% 42%, 0 42%, 0 58%, 50% 92%, 100% 58%, 0 58%);
+  }
+
+  .yf-table th[aria-sort="ascending"] > button::after {
+    opacity: 1;
+    clip-path: polygon(0 65%, 50% 30%, 100% 65%);
+  }
+
+  .yf-table th[aria-sort="descending"] > button::after {
+    opacity: 1;
+    clip-path: polygon(0 35%, 50% 70%, 100% 35%);
+  }
+
+  /* numeric columns keep their label flush right, the arrow on its left */
+  .yf-table th:is(.yf-num, [data-type="number"]) > button {
+    flex-direction: row-reverse;
+  }
+
+  /* empty state: one row, shown only while no other row is visible in the body
+     (a filter that sets hidden on rows counts) */
+  .yf-table__empty td {
+    padding: var(--yf-space-6) var(--yf-space-3);
+    color: var(--yf-muted);
+    text-align: center;
+  }
+
+  .yf-table tbody:has(> tr:not(.yf-table__empty, [hidden])) > .yf-table__empty {
+    display: none;
+  }
+
+  .yf-table tbody tr.yf-table__empty:hover {
+    background: none;
+  }
+
+  /* ---------- status pill ----------
+     <span class="yf-status yf-status--danger">Critical</span>
+     The label is always text. The dot is a second cue, never the only one; an icon
+     as the first child replaces the dot. Without a modifier (or with --neutral) it is
+     an outline. */
+
+  .yf-status {
+    --_fg: var(--yf-muted);
+    --_bg: transparent;
+    --_bd: var(--yf-rule);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.0625rem 0.4375rem;
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  /* the plain pill is the neutral one: an outline with a hollow dot */
+  .yf-status::before {
+    content: "";
+    flex: none;
+    box-sizing: border-box;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .yf-status:has(> .yf-icon)::before {
+    display: none;
+  }
+
+  .yf-status > .yf-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-inline: -0.0625rem;
+  }
+
+  .yf-status--danger {
+    --_fg: var(--yf-danger);
+    --_bg: var(--yf-danger-bg);
+    --_bd: transparent;
+  }
+
+  .yf-status--warning {
+    --_fg: var(--yf-warning);
+    --_bg: var(--yf-warning-bg);
+    --_bd: transparent;
+  }
+
+  .yf-status--success {
+    --_fg: var(--yf-success);
+    --_bg: var(--yf-success-bg);
+    --_bd: transparent;
+  }
+
+  /* a status colour has a solid dot */
+  :is(.yf-status--danger, .yf-status--warning, .yf-status--success)::before {
+    background: currentColor;
+  }
+
+  /* ---------- count ----------
+     <span class="yf-count">12</span> after a label: in a tab, a button, a nav link.
+     Tabular figures on the rule colour, like inline code. It takes the label's colour, so
+     a selected tab's count is ink and a resting one muted. The label says what it counts. */
+
+  .yf-count {
+    display: inline-block;
+    min-inline-size: 1.6em;
+    padding: 0.1em 0.4em;
+    border-radius: var(--yf-radius);
+    background: var(--yf-rule);
+    color: inherit;
+    font-size: var(--yf-text-xs);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  /* on solid ink (a primary or pressed button) the rule colour would vanish */
+  :is(.yf-button--primary, .yf-button[aria-pressed="true"]) .yf-count {
+    background: color-mix(in srgb, var(--yf-on-primary) 22%, transparent);
+  }
+
+  /* ---------- stat ----------
+     <dl class="yf-stats-row">
+       <div class="yf-stat">
+         <dt class="yf-stat__label">Open findings</dt>
+         <dd class="yf-stat__value">42</dd>
+         <dd class="yf-stat__delta yf-stat__delta--up yf-stat__delta--danger">+6 since Monday</dd>
+         <dd><span class="yf-sparkline" data-yf-sparkline="3,5,4,8"></span></dd>
+       </div>
+     </dl>
+     Any element works for .yf-stat; the delta text carries the meaning, the arrow is extra. */
+
+  .yf-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--yf-space-1);
+    min-width: 0;
+    margin: 0;
+  }
+
+  .yf-stat :is(dt, dd) {
+    margin: 0;
+  }
+
+  .yf-stat__label {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.3;
+  }
+
+  .yf-stat__value {
+    font-size: var(--yf-text-2xl);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-display);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-stat__unit {
+    margin-left: 0.15em;
+    color: var(--yf-muted);
+    font-size: 0.5em;
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: 0;
+  }
+
+  .yf-stat__delta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25em;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--yf-weight-medium);
+    line-height: 1.4;
+  }
+
+  .yf-stat__delta--up::before {
+    content: "\2191";
+  }
+
+  .yf-stat__delta--down::before {
+    content: "\2193";
+  }
+
+  @supports (content: "x" / "") {
+    .yf-stat__delta--up::before {
+      content: "\2191" / "";
+    }
+
+    .yf-stat__delta--down::before {
+      content: "\2193" / "";
+    }
+  }
+
+  .yf-stat__delta--danger {
+    color: var(--yf-danger);
+  }
+
+  .yf-stat__delta--warning {
+    color: var(--yf-warning);
+  }
+
+  .yf-stat__delta--success {
+    color: var(--yf-success);
+  }
+
+  .yf-stat .yf-sparkline {
+    display: block;
+    width: 100%;
+    max-width: 10rem;
+    margin-top: var(--yf-space-2);
+  }
+
+  /* a row of stats with 1px rules between them (like the sample dashboard).
+     Each cell has a left rule; clipping the row's first pixel hides it at the start of
+     every wrapped line, so the rules stay between stats whatever the width. */
+  .yf-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    margin: 0;
+    border-bottom: 1px solid var(--yf-rule);
+    clip-path: inset(0 0 0 1px);
+  }
+
+  .yf-stats-row > .yf-stat {
+    padding: var(--yf-space-4);
+    border-top: 1px solid var(--yf-rule);
+    border-left: 1px solid var(--yf-rule);
+  }
+
+  /* On a phone the stats keep one row and scroll sideways, rather than leave the last one
+     alone on a line; a cell is narrower than half the row, so the next one peeks in. */
+  @media (max-width: 36rem) {
+    .yf-stats-row {
+      grid-template-columns: none;
+      grid-auto-columns: minmax(9.5rem, 1fr);
+      grid-auto-flow: column;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .yf-stats-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .yf-stats-row > .yf-stat {
+      scroll-snap-align: start;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      .yf-stats-row {
+        mask-image: linear-gradient(to right, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+        animation: yf-edge-fade linear both;
+        animation-timeline: scroll(self inline);
+      }
+
+      .yf-stats-row:dir(rtl) {
+        mask-image: linear-gradient(to left, transparent, #000 var(--yf-fade-start), #000 calc(100% - var(--yf-fade-end)), transparent);
+      }
+    }
+  }
+
+  /* ---------- key-value list ----------
+     <dl class="yf-kv"><div><dt>Region</dt><dd>eu-west-1</dd></div> ... </dl>
+     One value per key. Stacks under 36rem; .yf-kv--stack stacks it at any width. */
+
+  .yf-kv {
+    display: grid;
+    grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr);
+    margin: 0;
+    border-top: 1px solid var(--yf-rule);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+
+  .yf-kv > div {
+    display: contents;
+  }
+
+  .yf-kv :is(dt, dd) {
+    margin: 0;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-kv dt {
+    padding-right: var(--yf-space-4);
+    color: var(--yf-muted);
+  }
+
+  .yf-kv dd {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-kv {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .yf-kv dt {
+      padding-bottom: 0;
+      border-bottom: 0;
+      font-size: var(--yf-text-xs);
+    }
+
+    .yf-kv dd {
+      padding-top: 0.125rem;
+    }
+  }
+
+  .yf-kv--stack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .yf-kv--stack dt {
+    padding-bottom: 0;
+    border-bottom: 0;
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-kv--stack dd {
+    padding-top: 0.125rem;
+  }
+
+  /* ---------- progress ----------
+     <progress class="yf-progress" value="40" max="100" aria-label="Scan progress"></progress>
+     Leave out value for indeterminate. Ink bar on a rule track; ink is not a status. */
+
+  .yf-progress {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 0.375rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+    color: var(--yf-fg);
+  }
+
+  .yf-progress::-webkit-progress-bar {
+    background: transparent;
+  }
+
+  .yf-progress::-webkit-progress-value {
+    background: var(--yf-fg);
+    transition: width var(--yf-dur) var(--yf-ease-out);
+  }
+
+  .yf-progress::-moz-progress-bar {
+    background: var(--yf-fg);
+  }
+
+  /* indeterminate: a bar sweeps along the element's own background, which works in every
+     engine (the pseudo-elements are not animatable in WebKit and Blink) */
+  .yf-progress:indeterminate {
+    background:
+      linear-gradient(var(--yf-fg), var(--yf-fg)) no-repeat -55% 0 / 35% 100%,
+      var(--yf-rule);
+    animation: yf-progress-sweep 1.6s var(--yf-ease-out) infinite;
+  }
+
+  .yf-progress:indeterminate::-webkit-progress-value,
+  .yf-progress:indeterminate::-moz-progress-bar {
+    background: transparent;
+  }
+
+  @keyframes yf-progress-sweep {
+    to {
+      background-position-x: 155%, 0;
+    }
+  }
+
+  /* no motion: a still striped track says "working" without moving */
+  @media (prefers-reduced-motion: reduce) {
+    .yf-progress:indeterminate {
+      background: repeating-linear-gradient(90deg, var(--yf-fg) 0 0.375rem, var(--yf-rule) 0.375rem 0.75rem);
+      animation: none;
+    }
+  }
+
+  /* ---------- meter ----------
+     <meter class="yf-meter" min="0" max="100" low="60" high="85" optimum="0" value="72"></meter>
+     The browser picks the state from low, high and optimum. A healthy value is the
+     normal state, so it stays ink; only the warning and danger ranges take a status
+     colour. Show the value as text beside it. */
+
+  .yf-meter {
+    --yf-meter-optimum: var(--yf-fg);
+    --yf-meter-suboptimum: var(--yf-warning);
+    --yf-meter-danger: var(--yf-danger);
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 0.375rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+  }
+
+  .yf-meter::-webkit-meter-bar {
+    height: 0.375rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--yf-rule);
+  }
+
+  .yf-meter::-webkit-meter-optimum-value {
+    background: var(--yf-meter-optimum);
+  }
+
+  .yf-meter::-webkit-meter-suboptimum-value {
+    background: var(--yf-meter-suboptimum);
+  }
+
+  .yf-meter::-webkit-meter-even-less-good-value {
+    background: var(--yf-meter-danger);
+  }
+
+  .yf-meter::-moz-meter-bar {
+    background: var(--yf-meter-optimum);
+  }
+
+  .yf-meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: var(--yf-meter-suboptimum);
+  }
+
+  .yf-meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: var(--yf-meter-danger);
+  }
+
+  /* ---------- code block ----------
+     <div class="yf-code">
+       <div class="yf-code__head">
+         <span class="yf-code__file">deploy.sh</span>
+         <button class="yf-code__copy" type="button" data-yf-copy>
+           <svg class="yf-icon yf-icon--sm" aria-hidden="true"><use href="icons/yf-icons.svg#copy"/></svg>
+           <span data-yf-copy-label>Copy</span>
+         </button>
+       </div>
+       <pre tabindex="0"><code>...</code></pre>
+     </div>
+     Without a head, put the button straight inside .yf-code and it floats top right.
+     The pre scrolls; give it tabindex="0" so the keyboard can. */
+
+  .yf-code {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--yf-rule);
+    background: var(--yf-sunk);
+    color: var(--yf-fg);
+    font-family: var(--yf-font-mono);
+    font-size: 0.8125rem;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+    line-height: 1.6;
+  }
+
+  .yf-code__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--yf-space-3);
+    min-height: 2.25rem;
+    padding: var(--yf-space-1) var(--yf-space-2) var(--yf-space-1) var(--yf-space-4);
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-code__file {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .yf-code pre {
+    margin: 0;
+    padding: 0.875rem var(--yf-space-4);
+    overflow: auto;
+    max-height: var(--yf-code-max-h, none);
+    background: none;
+    border: 0;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  .yf-code pre:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: -2px;
+  }
+
+  /* a block of code is not inline code: drop the inline chip */
+  .yf-code pre code {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .yf-code--wrap pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-code__copy {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.75rem;
+    padding: 0 var(--yf-space-2);
+    border: 1px solid transparent;
+    border-radius: var(--yf-radius);
+    background: transparent;
+    color: var(--yf-muted);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-xs);
+    font-weight: var(--yf-weight-medium);
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color var(--yf-dur-fast) var(--yf-ease-out),
+      color var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  .yf-code__copy:hover {
+    background: var(--yf-hover);
+    color: var(--yf-fg);
+  }
+
+  .yf-code__copy:active {
+    background: var(--yf-selected);
+  }
+
+  .yf-code__copy:focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  .yf-code__copy:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .yf-code__copy[data-state="copied"] {
+    color: var(--yf-success);
+  }
+
+  /* no head: the button floats over the block. It is opaque, so a long line scrolling under
+     it does not show through. */
+  .yf-code > .yf-code__copy {
+    position: absolute;
+    top: var(--yf-space-2);
+    right: var(--yf-space-2);
+    border-color: var(--yf-rule);
+    background: color-mix(in srgb, var(--yf-fg) 4%, var(--yf-sunk));
+  }
+
+  .yf-code > .yf-code__copy:hover {
+    background: color-mix(in srgb, var(--yf-fg) 9%, var(--yf-sunk));
+  }
+
+  .yf-code > .yf-code__copy:active {
+    background: color-mix(in srgb, var(--yf-fg) 14%, var(--yf-sunk));
+  }
+
+  .yf-code--wrap > .yf-code__copy ~ pre {
+    padding-right: 5.5rem;
+  }
+
+  /* ---------- sparkline ----------
+     <span class="yf-sparkline" data-yf-sparkline="3,5,4,8" data-yf-threshold=">7"></span>
+     yf.sparkline draws the SVG. data-yf-threshold: ">7" (bad above) or "<95" (bad below);
+     a bare number means above. Size the host with CSS; the drawing stretches to it. */
+
+  .yf-sparkline {
+    display: inline-block;
+    width: 6rem;
+    height: 1.5rem;
+    color: var(--yf-fg);
+    line-height: 0;
+    vertical-align: middle;
+  }
+
+  .yf-sparkline > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .yf-sparkline__line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* the last point: a zero-length stroke with round caps is a dot that stays round when the
+     drawing is stretched */
+  .yf-sparkline__dot {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 5;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .yf-sparkline__dot.is-over {
+    stroke: var(--yf-danger);
+  }
+
+  .yf-sparkline__limit {
+    fill: none;
+    stroke: var(--yf-danger);
+    stroke-width: 1;
+    stroke-dasharray: 3 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* ---------- chart helpers (hand- or JS-made SVG) ----------
+     <svg class="yf-chart" viewBox="0 0 340 150">
+       <line class="yf-chart-grid" .../> <text x=".." y="..">25</text>
+       <path class="yf-series-1" fill="none" stroke-width="2" d=".."/>
+     </svg>
+     Series colour, dash and (for shapes) fill come from the series tokens. stroke-width is
+     yours: set it as an attribute, since a CSS rule here would beat that attribute. */
+
+  .yf-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: 10px;
+    font-variant-ligatures: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-chart text {
+    fill: var(--yf-muted);
+    font: inherit;
+    stroke: none;
+  }
+
+  .yf-chart .yf-chart-label {
+    fill: var(--yf-fg);
+  }
+
+  .yf-chart-grid {
+    fill: none;
+    stroke: var(--yf-rule);
+    shape-rendering: crispEdges;
+  }
+
+  .yf-chart-axis {
+    fill: none;
+    stroke: var(--yf-fg);
+    shape-rendering: crispEdges;
+  }
+
+  /* lines (path, polyline, line): ink shade plus dash */
+  :is(path, polyline, line):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: none;
+  }
+
+  /* shapes (rect, circle, ellipse, polygon): filled with the shade, no stroke */
+  :is(rect, circle, ellipse, polygon):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    stroke: none;
+  }
+
+  .yf-series-1 {
+    --_s: var(--yf-series-1);
+    stroke: var(--yf-series-1);
+    stroke-dasharray: var(--yf-dash-1);
+  }
+
+  .yf-series-2 {
+    --_s: var(--yf-series-2);
+    stroke: var(--yf-series-2);
+    stroke-dasharray: var(--yf-dash-2);
+  }
+
+  .yf-series-3 {
+    --_s: var(--yf-series-3);
+    stroke: var(--yf-series-3);
+    stroke-dasharray: var(--yf-dash-3);
+  }
+
+  .yf-series-4 {
+    --_s: var(--yf-series-4);
+    stroke: var(--yf-series-4);
+    stroke-dasharray: var(--yf-dash-4);
+  }
+
+  :is(rect, circle, ellipse, polygon):is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: var(--_s);
+  }
+
+  /* a path closed into an area: the shade at low strength under its line */
+  path.yf-area:is(.yf-series-1, .yf-series-2, .yf-series-3, .yf-series-4) {
+    fill: var(--_s);
+    fill-opacity: 0.12;
+  }
+
+  /* a limit: dashed danger. Status colour is for thresholds only. */
+  .yf-chart-threshold {
+    fill: none;
+    stroke: var(--yf-danger);
+    stroke-dasharray: 4 3;
+    stroke-width: 1;
+  }
+
+  .yf-chart text.yf-chart-threshold {
+    fill: var(--yf-danger);
+    stroke: none;
+  }
+
+  /* legend: <ul class="yf-legend"><li><svg class="yf-legend__key" ...><line class="yf-series-2" .../></svg> Staging</li> */
+  .yf-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--yf-space-1) var(--yf-space-4);
+    margin: 0;
+    padding: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-xs);
+    list-style: none;
+  }
+
+  .yf-legend > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .yf-legend__key {
+    flex: none;
+    width: 1.5rem;
+    height: 0.5rem;
+    overflow: visible;
+  }
+
+  .yf-legend__key :is(line, path, polyline) {
+    stroke-width: 2;
+  }
+
+  /* the legend yf.chart draws sits right under its svg */
+  .yf-chart + .yf-legend {
+    padding-block-start: var(--yf-space-2);
+  }
+}

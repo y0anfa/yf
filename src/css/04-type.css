@@ -1,0 +1,88 @@
+/* Type utilities. Sizes come from the scale; headings keep their semantic size
+   unless one of these says otherwise. */
+
+@layer yf.utilities {
+  .yf-text-xs {
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-text-sm {
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-text-base {
+    font-size: var(--yf-text-base);
+  }
+
+  .yf-text-lg {
+    font-size: var(--yf-text-lg);
+  }
+
+  .yf-text-xl {
+    font-size: var(--yf-text-xl);
+    letter-spacing: var(--yf-tracking-tight);
+  }
+
+  .yf-text-2xl {
+    font-size: var(--yf-text-2xl);
+    line-height: var(--yf-leading-tight);
+    letter-spacing: var(--yf-tracking-tight);
+  }
+
+  .yf-text-3xl {
+    font-size: var(--yf-text-3xl);
+    line-height: var(--yf-leading-tight);
+    letter-spacing: var(--yf-tracking-display);
+  }
+
+  /* ids, hashes, code, numbers in tables */
+  .yf-mono {
+    font-family: var(--yf-font-mono);
+    font-weight: var(--yf-weight-regular);
+    font-synthesis-weight: none;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+  }
+
+  .yf-muted {
+    color: var(--yf-muted);
+  }
+
+  /* figures that line up in columns */
+  .yf-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-bold {
+    font-weight: var(--yf-weight-bold);
+  }
+
+  /* A small muted label above a section, as the log's heading on yoanfaure.com:
+     sentence case at 600, not shouted in capitals. */
+  .yf-eyebrow {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: 0;
+  }
+
+  /* One line with an ellipsis. Needs a width: a block, a flex item with min-width 0, or a fixed table cell. */
+  .yf-truncate {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* off screen, still read by screen readers */
+  .yf-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

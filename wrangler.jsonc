@@ -1,0 +1,20 @@
+{
+  // Assets-only Worker: serves the static site built into ./dist/site.
+  // There is no `main` entry point; Cloudflare serves the assets directly.
+  // scripts/build --production writes dist/site: every frozen release (v*/), the docs
+  // page, 404.html and _headers.
+  "name": "yf-ds",
+  "compatibility_date": "2026-10-01",
+
+  // A Workers custom domain: Cloudflare owns its DNS record and certificate.
+  // yoanfaure.com must be a zone in the same Cloudflare account.
+  "routes": [{ "pattern": "ds.yoanfaure.com", "custom_domain": true }],
+
+  "assets": {
+    "directory": "./dist/site",
+    // Unknown paths serve dist/site/404.html with a 404 status.
+    "not_found_handling": "404-page",
+    // / serves index.html; /404 serves 404.html.
+    "html_handling": "auto-trailing-slash"
+  }
+}

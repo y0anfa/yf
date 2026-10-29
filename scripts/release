@@ -1,0 +1,76 @@
+#!/bin/sh
+# Freezes the current source as a release: releases/vX.Y.Z/.
+#
+# usage: scripts/release X.Y.Z
+#
+# Rules:
+#   - X.Y.Z is plain semver (no leading v, no pre-release suffix).
+#   - VERSION must already say X.Y.Z. The script does not edit it: bump VERSION and
+#     commit it first, so the release is a deliberate act and the commit recorded in
+#     the release is the one that carries the new number.
+#   - releases/vX.Y.Z must not exist. A release is immutable; to change one, ship the
+#     next version. The deploy workflow fails a push that touches an old release.
+#   - With git, src/ and VERSION must be committed, so the recorded commit is the source
+#     the release was built from. YF_ALLOW_DIRTY=1 releases anyway and marks the commit dirty.
+#
+# It runs the dev build, copies dist/dev/ to releases/vX.Y.Z/ and adds a RELEASE file
+# (version, source commit if git is there, UTC date). It commits nothing; it prints what to.
+set -eu
+cd "$(dirname "$0")/.."
+
+die() {
+  echo "release: $*" >&2
+  exit 1
+}
+
+if [ "$#" -ne 1 ]; then
+  sed -n '/^# usage:/p' "$0" | sed 's/^# //' >&2
+  exit 2
+fi
+v=$1
+
+printf '%s' "$v" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' ||
+  die "'$v' is not X.Y.Z (digits only, no leading v, no leading zeros)"
+
+[ -e "releases/v$v" ] && die "releases/v$v already exists. Releases are immutable: bump VERSION and release the next one."
+
+current=$(tr -d ' \t\r\n' < VERSION)
+[ "$current" = "$v" ] || die "VERSION says $current, not $v. Set VERSION to $v and commit it, then run this again."
+
+commit=
+if command -v git > /dev/null 2>&1 && git rev-parse --git-dir > /dev/null 2>&1; then
+  commit=$(git rev-parse HEAD 2> /dev/null || true)
+  if [ -n "$commit" ] && [ -n "$(git status --porcelain -- src VERSION 2> /dev/null)" ]; then
+    if [ "${YF_ALLOW_DIRTY-}" = 1 ]; then
+      commit="$commit-dirty"
+    else
+      die "src/ or VERSION has uncommitted changes. Commit them first, so RELEASE names the source it was built from (or set YF_ALLOW_DIRTY=1)."
+    fi
+  fi
+fi
+
+scripts/build --dev-only
+
+mkdir -p releases
+tmp="releases/.v$v.tmp"
+rm -rf "$tmp"
+trap 'rm -rf "$tmp"' EXIT
+cp -R dist/dev "$tmp"
+{
+  printf 'version: %s\n' "$v"
+  if [ -n "$commit" ]; then printf 'commit: %s\n' "$commit"; fi
+  printf 'date: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} > "$tmp/RELEASE"
+mv "$tmp" "releases/v$v"
+trap - EXIT
+
+echo
+echo "released v$v -> releases/v$v"
+ls -l "releases/v$v" | sed 's/^/  /'
+echo
+echo "Nothing is committed. To publish it:"
+echo "  git add releases/v$v"
+echo "  git commit -m \"release v$v\""
+echo "  git push        # the deploy workflow builds and publishes https://ds.yoanfaure.com/v$v/"
+echo
+echo "Docs that describe v$v belong in the same push."

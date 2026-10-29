@@ -1,0 +1,423 @@
+/* Inputs: field, input, textarea, select, checkbox, radio, switch, fieldset.
+   Every control sits on --yf-sunk with a 1px edge that gets to full ink on hover and
+   focus, and turns danger when aria-invalid="true".
+
+   The resting edge is 55% ink, not --yf-rule: the rule colour is 1.3:1 against the
+   paper, and WCAG 1.4.11 asks 3:1 for the edge of a control. Proposed token:
+   --yf-control-border. Until it exists the same mix is the fallback. */
+
+@layer yf.components {
+  /* ---------- field ----------
+     <div class="yf-field">
+       <label for="email">Email</label>
+       <input class="yf-input" id="email" type="email" aria-describedby="email-help email-error" aria-invalid="true">
+       <p class="yf-help" id="email-help">We only use it to sign you in.</p>
+       <p class="yf-error" id="email-error">Enter an address like name@example.com.</p>
+     </div>
+     .yf-field--inline puts the label beside the control. */
+
+  .yf-field {
+    display: grid;
+    align-content: start;
+    gap: var(--yf-space-2);
+  }
+
+  .yf-label,
+  :where(.yf-field > label) {
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-field:has(:is(:disabled, [aria-disabled="true"])) > :where(label) {
+    color: var(--yf-muted);
+  }
+
+  .yf-help {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  /* danger text led by a "!", so the message is never colour alone */
+  .yf-error {
+    display: flex;
+    align-items: baseline;
+    gap: var(--yf-space-2);
+    color: var(--yf-danger);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-error::before {
+    content: "!";
+    content: "!" / "";
+    flex: none;
+    font-weight: var(--yf-weight-bold);
+  }
+
+  .yf-field--inline {
+    grid-template-columns: minmax(0, var(--yf-field-label, 10rem)) minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--yf-space-4);
+  }
+
+  .yf-field--inline > :where(:not(label, .yf-label)) {
+    grid-column: 2;
+  }
+
+  @media (max-width: 36rem) {
+    .yf-field--inline {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .yf-field--inline > :where(:not(label, .yf-label)) {
+      grid-column: auto;
+    }
+  }
+
+  /* ---------- input, textarea, select ---------- */
+
+  .yf-input,
+  .yf-textarea,
+  .yf-select {
+    --_bd: var(--yf-control-border, color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg)));
+
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding: 0 var(--yf-space-3);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--yf-sunk);
+    color: var(--yf-fg);
+    font: inherit;
+    font-size: var(--yf-text-base); /* 16px, so iOS does not zoom on focus */
+    line-height: var(--yf-leading-normal);
+    appearance: none;
+  }
+
+  .yf-input,
+  .yf-select {
+    block-size: var(--yf-control-h);
+  }
+
+  .yf-textarea {
+    min-block-size: calc(var(--yf-control-h) * 3);
+    padding-block: var(--yf-space-2);
+    resize: vertical;
+  }
+
+  .yf-input::placeholder,
+  .yf-textarea::placeholder {
+    color: var(--yf-muted);
+    opacity: 1;
+  }
+
+  .yf-input::file-selector-button {
+    margin-inline-end: var(--yf-space-3);
+    padding: 0 var(--yf-space-3);
+    border: 0;
+    border-inline-end: 1px solid var(--_bd);
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: var(--yf-weight-medium);
+    cursor: pointer;
+  }
+
+  /* the search clear button: an ink cross drawn with gradients, not the browser's blue
+     one; gradients are not images, so a page's CSP needs nothing for it */
+  .yf-input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    margin-inline-start: var(--yf-space-2);
+    background:
+      linear-gradient(45deg, transparent 43%, currentColor 43% 57%, transparent 57%),
+      linear-gradient(-45deg, transparent 43%, currentColor 43% 57%, transparent 57%);
+    color: var(--yf-muted);
+    cursor: pointer;
+  }
+
+  .yf-input[type="search"]::-webkit-search-cancel-button:hover {
+    color: var(--yf-fg);
+  }
+
+  /* the browser's autofill paints its own fill; paint ours over it */
+  .yf-input:-webkit-autofill {
+    -webkit-text-fill-color: var(--yf-fg);
+    box-shadow: inset 0 0 0 100vmax var(--yf-sunk);
+  }
+
+  @media (any-hover: hover) {
+    :is(.yf-input, .yf-textarea, .yf-select):hover:not(:is(:disabled, [readonly], [aria-disabled="true"], [aria-invalid="true"])) {
+      --_bd: var(--yf-fg);
+    }
+  }
+
+  /* Focus is the border itself, thickened to 2px with an inset line so nothing moves,
+     instead of the page's outside ring. A transparent outline stays for forced-colours
+     mode, which drops shadows. */
+  :is(.yf-input, .yf-textarea, .yf-select):focus {
+    --_bd: var(--yf-fg);
+    box-shadow: inset 0 0 0 1px var(--_bd);
+    outline: 2px solid transparent;
+    outline-offset: 0;
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select)[aria-invalid="true"] {
+    --_bd: var(--yf-danger);
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select)[readonly] {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+  }
+
+  :is(.yf-input, .yf-textarea, .yf-select):is(:disabled, [aria-disabled="true"]) {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  /* ---------- select ----------
+     The chevron is two gradient strokes, so it takes the text colour in either theme
+     and needs no image, no data: URI and nothing from the page's CSP. */
+
+  .yf-select {
+    --_arm: 0.4em;
+    --_stroke: 0.06em;
+
+    padding-inline-end: var(--yf-space-6);
+    background-image:
+      linear-gradient(to top right, transparent calc(50% - var(--_stroke)), currentColor calc(50% - var(--_stroke) + 0.02em), currentColor calc(50% + var(--_stroke) - 0.02em), transparent calc(50% + var(--_stroke))),
+      linear-gradient(to top left, transparent calc(50% - var(--_stroke)), currentColor calc(50% - var(--_stroke) + 0.02em), currentColor calc(50% + var(--_stroke) - 0.02em), transparent calc(50% + var(--_stroke)));
+    background-repeat: no-repeat;
+    background-size: var(--_arm) var(--_arm);
+    background-position:
+      right calc(var(--yf-space-3) + var(--_arm)) center,
+      right var(--yf-space-3) center;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  .yf-select:is([multiple], [size]:not([size="1"])) {
+    block-size: auto;
+    padding-block: var(--yf-space-2);
+    padding-inline-end: var(--yf-space-3);
+    background-image: none;
+  }
+
+  .yf-select:is(:disabled, [aria-disabled="true"]) {
+    cursor: not-allowed;
+  }
+
+  /* ---------- checkbox, radio, switch ----------
+     <label class="yf-checkbox"><input type="checkbox" name="a"> <span>Label</span></label>
+     <label class="yf-radio"><input type="radio" name="b"> <span>Label</span></label>
+     <label class="yf-switch"><input type="checkbox" role="switch"> <span>Label</span></label>
+     The native input stays, so keyboard, forms and screen readers work as they do. It
+     is only drawn differently: appearance none, the mark is its ::before. */
+
+  .yf-checkbox,
+  .yf-radio,
+  .yf-switch {
+    --_bd: var(--yf-control-border, color-mix(in srgb, var(--yf-fg) 55%, var(--yf-bg)));
+    --_box: var(--yf-text-lg);
+
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--yf-space-2);
+    line-height: var(--yf-leading-normal);
+    cursor: pointer;
+  }
+
+  .yf-checkbox > input,
+  .yf-radio > input,
+  .yf-switch > input {
+    display: grid;
+    flex: none;
+    place-content: center;
+    inline-size: var(--_box);
+    block-size: var(--_box);
+    margin-block-start: var(--yf-space-1); /* centres on the first line, where 1lh is not known */
+    margin-block-start: calc((1lh - var(--_box)) / 2);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--yf-sunk);
+    color: inherit;
+    cursor: inherit;
+    appearance: none;
+  }
+
+  .yf-checkbox > input::before,
+  .yf-radio > input::before {
+    content: "";
+    inline-size: calc(var(--_box) * 0.62);
+    block-size: calc(var(--_box) * 0.62);
+    background: var(--yf-on-primary);
+    transform: scale(0);
+  }
+
+  .yf-checkbox > input::before {
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+  }
+
+  .yf-radio > input,
+  .yf-radio > input::before {
+    border-radius: 50%;
+  }
+
+  .yf-radio > input::before {
+    inline-size: calc(var(--_box) * 0.36);
+    block-size: calc(var(--_box) * 0.36);
+  }
+
+  .yf-checkbox > input:is(:checked, :indeterminate),
+  .yf-radio > input:checked,
+  .yf-switch > input:checked {
+    --_bd: var(--yf-primary);
+    background-color: var(--yf-primary);
+  }
+
+  .yf-checkbox > input:is(:checked, :indeterminate)::before,
+  .yf-radio > input:checked::before {
+    transform: scale(1);
+  }
+
+  .yf-checkbox > input:indeterminate::before {
+    clip-path: polygon(0 38%, 100% 38%, 100% 62%, 0 62%);
+  }
+
+  /* switch: a square thumb in a 3px track, travelling the length of it */
+
+  .yf-switch {
+    --_box: var(--yf-text-xl);
+    --_pad: var(--yf-space-1);
+    --_thumb: calc(var(--_box) - 2px - 2 * var(--_pad));
+  }
+
+  .yf-switch > input {
+    position: relative;
+    display: block;
+    inline-size: calc(var(--_box) * 2);
+  }
+
+  .yf-switch > input::before {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--_pad);
+    inset-inline-start: var(--_pad);
+    inline-size: var(--_thumb);
+    block-size: var(--_thumb);
+    border-radius: calc(var(--yf-radius) - 1px);
+    background: var(--_bd);
+  }
+
+  .yf-switch > input:checked::before {
+    inset-inline-start: calc(100% - var(--_thumb) - var(--_pad));
+    background: var(--yf-on-primary);
+  }
+
+  /* states */
+
+  @media (any-hover: hover) {
+    :is(.yf-checkbox, .yf-radio, .yf-switch) > input:hover:not(:is(:disabled, [aria-disabled="true"], [aria-invalid="true"])) {
+      --_bd: var(--yf-fg);
+    }
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input[aria-invalid="true"] {
+    --_bd: var(--yf-danger);
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch):has(> input:is(:disabled, [aria-disabled="true"])) {
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input:is(:disabled, [aria-disabled="true"]) {
+    --_bd: var(--yf-rule);
+    background-color: transparent;
+  }
+
+  :is(.yf-checkbox, .yf-radio, .yf-switch) > input:is(:disabled, [aria-disabled="true"]):is(:checked, :indeterminate) {
+    background-color: var(--yf-rule);
+  }
+
+  :is(.yf-checkbox, .yf-radio) > input:is(:disabled, [aria-disabled="true"])::before,
+  .yf-switch > input:is(:disabled, [aria-disabled="true"]):checked::before {
+    background: var(--yf-muted);
+  }
+
+  .yf-switch > input:is(:disabled, [aria-disabled="true"]):not(:checked)::before {
+    background: var(--yf-rule);
+  }
+
+  /* forced colours drop backgrounds, which would hide a tick drawn as one */
+  @media (forced-colors: active) {
+    :is(.yf-checkbox, .yf-radio) > input::before,
+    .yf-switch > input::before {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .yf-switch > input:checked {
+      border-color: Highlight;
+    }
+  }
+
+  /* ---------- fieldset ----------
+     <fieldset class="yf-fieldset"><legend>Notify me by</legend> ...checkboxes... </fieldset>
+     --inline lays the options in a row. */
+
+  .yf-fieldset {
+    display: grid;
+    align-content: start;
+    gap: var(--yf-space-3);
+    padding: 0;
+    border: 0;
+  }
+
+  .yf-fieldset > legend {
+    padding: 0 0 var(--yf-space-3);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  .yf-fieldset--inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--yf-space-2) var(--yf-space-5);
+  }
+
+  .yf-fieldset--inline > :is(.yf-help, .yf-error) {
+    flex-basis: 100%;
+  }
+
+  /* ---------- motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    :is(.yf-input, .yf-textarea, .yf-select) {
+      transition: border-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    :is(.yf-checkbox, .yf-radio, .yf-switch) > input {
+      transition:
+        background-color var(--yf-dur-fast) var(--yf-ease-out),
+        border-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    :is(.yf-checkbox, .yf-radio) > input::before {
+      transition: transform var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-switch > input::before {
+      transition:
+        inset-inline-start var(--yf-dur) var(--yf-ease-out),
+        background-color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+  }
+}

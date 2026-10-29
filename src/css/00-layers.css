@@ -1,0 +1,5 @@
+/*! yf — Yoan Faure's design system. MIT licence. https://ds.yoanfaure.com */
+
+/* Cascade order. Everything yf ships lives in a layer, so any unlayered app CSS
+   wins without specificity fights. */
+@layer yf.reset, yf.tokens, yf.base, yf.layout, yf.components, yf.utilities;

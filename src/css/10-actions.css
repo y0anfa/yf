@@ -1,0 +1,271 @@
+/* Actions: button (primary, secondary, ghost, danger, icon), button group, link.
+   Variants only set a few private properties (--_bg, --_fg, --_bd and their hover
+   twins); states and sizing are written once. */
+
+@layer yf.components {
+  /* ---------- button ----------
+     <button class="yf-button">Cancel</button>                       secondary: 1px ink outline
+     <button class="yf-button yf-button--primary">Save</button>      solid ink; one per view
+     <button class="yf-button yf-button--ghost">Skip</button>        no border; fills on hover
+     <button class="yf-button yf-button--danger">Delete</button>     danger outline; fills on hover
+     <button class="yf-button yf-button--icon" aria-label="Copy">    square, icon only
+     <button class="yf-button yf-button--ghost yf-button--close" aria-label="Close"></button>
+     <button class="yf-button yf-button--sm" aria-pressed="false">iam</button>   compact: chips, filters
+     Icons are <svg class="yf-icon">, before or after the label. aria-busy="true" swaps
+     the label for a spinner and keeps the width. aria-pressed="true" fills it with ink. */
+
+  .yf-button {
+    --_bg: transparent;
+    --_fg: var(--yf-fg);
+    --_bd: var(--yf-fg);
+    --_bg-hover: var(--yf-hover);
+    --_fg-hover: var(--_fg);
+    --_bd-hover: var(--_bd);
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--yf-space-2);
+    block-size: var(--yf-control-h);
+    padding: 0 var(--yf-space-4);
+    border: 1px solid var(--_bd);
+    border-radius: var(--yf-radius);
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font: inherit;
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+    line-height: var(--yf-leading-tight);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    appearance: none;
+  }
+
+  /* an <a class="yf-button"> keeps its own look on focus; the page's link inversion is for text links */
+  .yf-button:focus-visible {
+    background-color: var(--_bg);
+    color: var(--_fg);
+  }
+
+  /* an icon at either end sits closer to the edge than text does */
+  .yf-button:has(> .yf-icon:first-child:not(:only-child)) {
+    padding-inline-start: var(--yf-space-3);
+  }
+
+  .yf-button:has(> .yf-icon:last-child:not(:only-child)) {
+    padding-inline-end: var(--yf-space-3);
+  }
+
+  @media (any-hover: hover) {
+    .yf-button:hover {
+      border-color: var(--_bd-hover);
+      background-color: var(--_bg-hover);
+      color: var(--_fg-hover);
+    }
+  }
+
+  .yf-button:not(:is(:disabled, [aria-disabled="true"])):active {
+    background-image: linear-gradient(var(--yf-selected), var(--yf-selected));
+  }
+
+  /* ---------- variants ---------- */
+
+  /* Solid ink. Hover eases it a step toward the paper and never flips it. */
+  .yf-button--primary {
+    --_bg: var(--yf-primary);
+    --_fg: var(--yf-on-primary);
+    --_bd: var(--yf-primary);
+    --_bg-hover: color-mix(in srgb, var(--yf-primary) 85%, var(--yf-bg));
+    --_fg-hover: var(--yf-on-primary);
+    --_bd-hover: var(--_bg-hover);
+  }
+
+  /* A ghost has no edge, so its hover fill is what shows where it ends; underline on
+     hover is already what .yf-link is for. */
+  .yf-button--ghost {
+    --_bd: transparent;
+  }
+
+  .yf-button--danger {
+    --_fg: var(--yf-danger);
+    --_bd: var(--yf-danger);
+    --_bg-hover: var(--yf-danger);
+    --_fg-hover: var(--yf-bg);
+  }
+
+  .yf-button--icon,
+  .yf-button--close {
+    inline-size: var(--yf-control-h);
+    padding: 0;
+  }
+
+  /* compact: filter chips and dense toolbars. 28px, still above the 24px minimum target. */
+  .yf-button--sm {
+    block-size: var(--yf-control-h-sm);
+    padding: 0 var(--yf-space-3);
+    font-size: var(--yf-text-xs);
+  }
+
+  .yf-button--sm:is(.yf-button--icon, .yf-button--close) {
+    inline-size: var(--yf-control-h-sm);
+    padding: 0;
+  }
+
+  /* a close button that draws its own cross, so it needs no sprite */
+  .yf-button--close::before {
+    content: "\00d7";
+    content: "\00d7" / "";
+    font-size: var(--yf-text-xl);
+    font-weight: var(--yf-weight-regular);
+    line-height: 1;
+  }
+
+  /* toggle: pressed is filled ink, and stays put on hover */
+  .yf-button[aria-pressed="true"] {
+    --_bg: var(--yf-primary);
+    --_fg: var(--yf-on-primary);
+    --_bd: var(--yf-primary);
+    --_bg-hover: var(--_bg);
+  }
+
+  /* ---------- busy ---------- */
+
+  .yf-button[aria-busy="true"] {
+    color: transparent;
+    pointer-events: none;
+  }
+
+  .yf-button[aria-busy="true"] > * {
+    opacity: 0;
+  }
+
+  .yf-button[aria-busy="true"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    inline-size: var(--yf-text-base);
+    block-size: var(--yf-text-base);
+    margin: auto;
+    border: 2px solid var(--_fg);
+    border-inline-end-color: transparent;
+    border-radius: 50%;
+  }
+
+  /* ---------- disabled ---------- */
+
+  .yf-button:is(:disabled, [aria-disabled="true"]) {
+    --_bg: transparent;
+    --_fg: var(--yf-muted);
+    --_bd: var(--yf-rule);
+    --_bg-hover: var(--_bg);
+    cursor: not-allowed;
+  }
+
+  .yf-button--primary:is(:disabled, [aria-disabled="true"]) {
+    --_bg: var(--yf-rule);
+  }
+
+  .yf-button--ghost:is(:disabled, [aria-disabled="true"]) {
+    --_bd: transparent;
+  }
+
+  a.yf-button[aria-disabled="true"] {
+    pointer-events: none;
+  }
+
+  /* ---------- button group ----------
+     <div class="yf-button-group" role="group" aria-label="View"> two or more .yf-button </div>
+     Attached, one shared edge between neighbours. */
+
+  .yf-button-group {
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .yf-button-group > .yf-button {
+    border-radius: 0;
+  }
+
+  .yf-button-group > .yf-button:first-child {
+    border-start-start-radius: var(--yf-radius);
+    border-end-start-radius: var(--yf-radius);
+  }
+
+  .yf-button-group > .yf-button:last-child {
+    border-start-end-radius: var(--yf-radius);
+    border-end-end-radius: var(--yf-radius);
+  }
+
+  .yf-button-group > .yf-button:not(:last-child) {
+    border-inline-end-width: 0;
+  }
+
+  .yf-button-group > .yf-button:focus-visible {
+    z-index: 1;
+  }
+
+  /* ---------- link ----------
+     A button or anchor that reads as a link: underlined, inverted on hover and focus. */
+
+  .yf-link {
+    display: inline;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .yf-link:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  @media (any-hover: hover) {
+    .yf-link:hover {
+      background: var(--yf-fg);
+      color: var(--yf-bg);
+    }
+  }
+
+  .yf-link:is(:disabled, [aria-disabled="true"]) {
+    background: none;
+    color: var(--yf-muted);
+    cursor: not-allowed;
+  }
+
+  /* ---------- motion ---------- */
+
+  @keyframes yf-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-button {
+      transition:
+        background-color var(--yf-dur-fast) var(--yf-ease-out),
+        border-color var(--yf-dur-fast) var(--yf-ease-out),
+        color var(--yf-dur-fast) var(--yf-ease-out);
+    }
+
+    .yf-button[aria-busy="true"]::before {
+      animation: yf-spin calc(var(--yf-dur-slow) * 2) linear infinite;
+    }
+  }
+}

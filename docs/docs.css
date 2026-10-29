@@ -1,0 +1,471 @@
+/* docs.css: the page around the examples. Layout, the sticky nav, the frame that holds a live
+   example, swatches, and a few demos. Everything else on the page is yf.
+
+   Unlayered on purpose: it sits above yf's layers, as an app's css does. Tokens only.
+   There is no inline style anywhere on the page (style-src 'self'), so every size a
+   generated fragment needs is a class here. */
+
+:root {
+  --docs-header-h: 3.5rem;
+  --docs-measure: 44rem;
+}
+
+html {
+  scroll-padding-top: calc(var(--docs-header-h) + var(--yf-space-4));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---------- header ---------- */
+
+.docs-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--yf-z-sticky);
+  background: var(--yf-bg);
+  border-bottom: var(--yf-border);
+}
+
+.docs-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--yf-space-3);
+  min-block-size: var(--docs-header-h);
+}
+
+.docs-brand {
+  font-size: var(--yf-text-xl);
+  font-weight: var(--yf-weight-bold);
+  letter-spacing: var(--yf-tracking-display);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.docs-version {
+  font-size: var(--yf-text-sm);
+}
+
+.docs-theme-toggle {
+  margin-inline-start: auto;
+}
+
+/* the nav toggle exists only with JS and only on a narrow screen */
+@media (min-width: 60rem) {
+  .docs-nav-toggle {
+    display: none;
+  }
+}
+
+/* ---------- layout: nav, then the page ---------- */
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--yf-space-6);
+  padding-block: var(--yf-space-5) var(--yf-space-8);
+}
+
+@media (min-width: 60rem) {
+  .docs-layout {
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: var(--yf-space-7);
+  }
+}
+
+/* ---------- nav ---------- */
+
+.docs-nav {
+  display: grid;
+  gap: var(--yf-space-4);
+  align-content: start;
+  font-size: var(--yf-text-sm);
+}
+
+.docs-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-nav a {
+  display: block;
+  padding: 0.2rem var(--yf-space-2);
+  border-inline-start: 2px solid transparent;
+  text-decoration: none;
+}
+
+.docs-nav__title {
+  font-weight: var(--yf-weight-bold);
+}
+
+.docs-nav__title a {
+  padding-block: 0.3rem;
+}
+
+.docs-nav a[aria-current="true"] {
+  border-inline-start-color: var(--yf-fg);
+  font-weight: var(--yf-weight-medium);
+}
+
+/* a sidebar that stays in view and scrolls on its own */
+@media (min-width: 60rem) {
+  .docs-nav {
+    position: sticky;
+    top: var(--docs-header-h);
+    align-self: start;
+    max-block-size: calc(100vh - var(--docs-header-h));
+    max-block-size: calc(100dvh - var(--docs-header-h));
+    padding-block: var(--yf-space-3) var(--yf-space-5);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* a phone: the nav is a panel under the header, opened by the toggle. Without JS it is just
+   the list at the top of the page. */
+@media (max-width: 59.99rem) {
+  .docs-js .docs-nav:not([data-open]) {
+    display: none;
+  }
+
+  .docs-js .docs-nav[data-open] {
+    position: fixed;
+    inset-block: var(--docs-header-h) 0;
+    inset-inline: 0;
+    z-index: var(--yf-z-dropdown);
+    padding: var(--yf-space-4) var(--yf-gutter) var(--yf-space-7);
+    overflow-y: auto;
+    background: var(--yf-bg);
+    font-size: var(--yf-text-base);
+  }
+
+  .docs-js .docs-nav[data-open] a {
+    padding-block: 0.4rem;
+  }
+
+  :root:has(.docs-nav[data-open]) {
+    overflow: hidden;
+  }
+}
+
+/* ---------- the page ---------- */
+
+.docs-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--yf-space-8);
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.docs-hero {
+  padding-block-start: var(--yf-space-3);
+}
+
+.docs-lead {
+  max-inline-size: var(--docs-measure);
+}
+
+.docs-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--yf-space-7);
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.docs-group > h2 {
+  padding-block-start: var(--yf-space-3);
+  border-block-start: var(--yf-border-strong);
+}
+
+.docs-group__intro {
+  max-inline-size: var(--docs-measure);
+  margin-block-start: calc(-1 * var(--yf-space-4));
+}
+
+.docs-topic {
+  min-inline-size: 0;
+}
+
+.docs-topic > :is(p, ul, ol) {
+  max-inline-size: var(--docs-measure);
+}
+
+.docs-topic > h3 {
+  padding-block-start: var(--yf-space-2);
+}
+
+.docs-topic > h4 {
+  margin-block-start: var(--yf-space-3);
+}
+
+.docs-footer {
+  padding-block: var(--yf-space-5);
+  border-block-start: var(--yf-border);
+}
+
+/* ---------- a live example and its code ---------- */
+
+.docs-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+}
+
+.docs-demo__live {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--yf-space-4);
+  min-inline-size: 0;
+  padding: var(--yf-space-5);
+  border: var(--yf-border);
+}
+
+/* the live part and its code are one unit: one rule between them */
+.docs-demo > .docs-demo__live + .yf-code {
+  border-block-start: 0;
+}
+
+.docs-demo > .docs-demo__live:has(+ .yf-code) {
+  border-block-end: var(--yf-border);
+}
+
+.docs-demo .yf-code {
+  --yf-code-max-h: 18rem;
+}
+
+/* a demo that is not an example (no code under it) still gets a frame */
+.docs-topic > .docs-demo__live {
+  padding: var(--yf-space-5);
+}
+
+/* tooltips and menus need room above and below the trigger */
+.docs-demo--roomy .docs-demo__live {
+  padding-block: 3.5rem;
+}
+
+/* layout examples: show the boxes that the layout primitives place */
+.docs-demo--tiles .docs-demo__live :is(.yf-stack, .yf-cluster, .yf-grid, .yf-split) > * {
+  padding: var(--yf-space-2) var(--yf-space-3);
+  border: 1px solid var(--yf-rule);
+  background: var(--yf-sunk);
+  font-size: var(--yf-text-sm);
+}
+
+.docs-demo--tiles .docs-demo__live .yf-column > * {
+  background: var(--yf-sunk);
+}
+
+/* ---------- generated tables: swatches, notes, specimens ---------- */
+
+.docs-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: var(--yf-space-5);
+}
+
+.docs-theme__title {
+  margin-block-end: var(--yf-space-2);
+  color: var(--yf-muted);
+  font-size: var(--yf-text-sm);
+  font-weight: var(--yf-weight-medium);
+}
+
+.docs-themes .yf-table :is(th, td) {
+  padding-inline: var(--yf-space-2);
+}
+
+.docs-themes .yf-table th .yf-mono {
+  white-space: nowrap;
+}
+
+.docs-token {
+  display: block;
+}
+
+.docs-token + .docs-token {
+  margin-block-start: var(--yf-space-2);
+}
+
+.docs-swatch {
+  display: block;
+  inline-size: 1.75rem;
+  block-size: 1.25rem;
+  border: 1px solid var(--yf-control-border);
+}
+
+.docs-swatches {
+  display: inline-flex;
+}
+
+.docs-swatches > .docs-swatch + .docs-swatch {
+  border-inline-start: 0;
+}
+
+.docs-series {
+  display: block;
+  inline-size: 3rem;
+  block-size: 0.5rem;
+  overflow: visible;
+}
+
+.docs-note {
+  display: block;
+  color: var(--yf-muted);
+  font-family: var(--yf-font-sans);
+  font-size: var(--yf-text-xs);
+  font-weight: var(--yf-weight-regular);
+}
+
+.docs-note.yf-mono {
+  font-family: var(--yf-font-mono);
+}
+
+.docs-specimen {
+  display: block;
+  white-space: nowrap;
+}
+
+/* the bars of the spacing scale; widths are the tokens themselves */
+.docs-space {
+  display: block;
+  block-size: 0.75rem;
+  background: var(--yf-fg);
+}
+
+.docs-space--1 { inline-size: var(--yf-space-1); }
+.docs-space--2 { inline-size: var(--yf-space-2); }
+.docs-space--3 { inline-size: var(--yf-space-3); }
+.docs-space--4 { inline-size: var(--yf-space-4); }
+.docs-space--5 { inline-size: var(--yf-space-5); }
+.docs-space--6 { inline-size: var(--yf-space-6); }
+.docs-space--7 { inline-size: var(--yf-space-7); }
+.docs-space--8 { inline-size: var(--yf-space-8); }
+
+/* ---------- radius ---------- */
+
+.docs-radius {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--yf-space-4);
+}
+
+.docs-radius__panel {
+  padding: var(--yf-space-3) var(--yf-space-4);
+  border: var(--yf-border);
+  border-radius: var(--yf-radius-layout);
+  background: var(--yf-sunk);
+  font-size: var(--yf-text-sm);
+}
+
+/* ---------- motion ---------- */
+
+.docs-motion {
+  justify-items: start;
+}
+
+.docs-motion__row {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--yf-space-3);
+  inline-size: 100%;
+  font-size: var(--yf-text-sm);
+}
+
+.docs-motion__track {
+  position: relative;
+  block-size: 1rem;
+  border-block: 1px solid var(--yf-rule);
+}
+
+.docs-motion__dot {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 1rem;
+  background: var(--yf-fg);
+}
+
+[data-on] .docs-motion__dot {
+  inset-inline-start: calc(100% - 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-motion__dot--fast {
+    transition: inset-inline-start var(--yf-dur-fast) var(--yf-ease-out);
+  }
+
+  .docs-motion__dot--base {
+    transition: inset-inline-start var(--yf-dur) var(--yf-ease-out);
+  }
+
+  .docs-motion__dot--slow {
+    transition: inset-inline-start var(--yf-dur-slow) var(--yf-ease-out);
+  }
+}
+
+/* ---------- the icon grid ---------- */
+
+.docs-icon-group {
+  display: grid;
+  gap: var(--yf-space-2);
+  margin-block-end: var(--yf-space-5);
+}
+
+.docs-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  margin: 0;
+  padding: 0;
+  border-block-start: var(--yf-border);
+  list-style: none;
+}
+
+.docs-icon {
+  display: flex;
+  align-items: center;
+  gap: var(--yf-space-3);
+  min-inline-size: 0;
+  padding: var(--yf-space-1) var(--yf-space-1) var(--yf-space-1) var(--yf-space-3);
+  border-block-end: var(--yf-border);
+}
+
+.docs-icon > code {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  font-size: var(--yf-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docs-icon__copy {
+  flex: none;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 36rem) {
+  .docs-demo__live {
+    padding: var(--yf-space-4);
+  }
+
+  .docs-header__inner {
+    gap: var(--yf-space-2);
+  }
+
+  .docs-theme-toggle .yf-button {
+    padding-inline: var(--yf-space-2);
+  }
+}

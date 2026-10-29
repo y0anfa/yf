@@ -1,0 +1,1124 @@
+<!doctype html>
+<!--
+  The docs page, built with yf. This is a template: scripts/build expands it into
+  dist/site/index.html (see scripts/lib/examples.awk). An example block writes the markup
+  once and the build emits it twice, live and as an escaped code block, so what you read is
+  what runs. Fragments (colours, type, spacing, icons, releases) are generated from the
+  release's own yf.css and sprite. Double-brace tokens (BASE, CDN, VERSION, VERSION_SHOWN,
+  ICON_COUNT, SPRITE) are filled in by the build.
+  No inline script and no inline style, ever: the page is served with script-src 'self'
+  and style-src 'self'.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>yf design system</title>
+<meta name="description" content="yf is the design system behind yoanfaure.com: plain CSS and a little vanilla JavaScript, ink on paper, a square layout.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23262523'/%3E%3Ctext x='8' y='11.5' font-family='monospace' font-size='9' font-weight='bold' text-anchor='middle' fill='%23f4efe4'%3Eyf%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="{{BASE}}/yf.css">
+<link rel="stylesheet" href="/_docs/docs.css">
+<!-- in head and without defer, so the saved theme applies before first paint -->
+<script src="{{BASE}}/yf.js"></script>
+<script src="/_docs/docs.js" defer></script>
+</head>
+<body>
+<a class="yf-skip-link" href="#main">Skip to content</a>
+
+<header class="docs-header">
+  <div class="yf-container docs-header__inner">
+    <button class="yf-button yf-button--ghost yf-button--icon docs-nav-toggle" type="button" data-docs-nav-toggle aria-controls="nav" aria-expanded="false" aria-label="Show sections" hidden><svg class="yf-icon" aria-hidden="true"><use href="{{BASE}}/icons/yf-icons.svg#list"/></svg></button>
+    <a class="docs-brand" href="#top">yf</a>
+    <span class="docs-version yf-mono yf-muted">{{VERSION_SHOWN}}</span>
+    <div class="yf-button-group docs-theme-toggle" role="group" aria-label="Theme">
+      <button class="yf-button" type="button" data-yf-theme-toggle="light">light</button>
+      <button class="yf-button" type="button" data-yf-theme-toggle="system">system</button>
+      <button class="yf-button" type="button" data-yf-theme-toggle="dark">dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="yf-container docs-layout">
+
+<nav class="docs-nav" id="nav" aria-label="Sections">
+  <div class="docs-nav__group">
+    <p class="docs-nav__title"><a href="#getting-started">getting started</a></p>
+    <ul>
+      <li><a href="#install">install</a></li>
+      <li><a href="#versions">pinned versions</a></li>
+      <li><a href="#sprite">icon sprite</a></li>
+      <li><a href="#artifacts">claude artifacts</a></li>
+      <li><a href="#theming">theming</a></li>
+      <li><a href="#layers">cascade layers</a></li>
+      <li><a href="#javascript">javascript</a></li>
+    </ul>
+  </div>
+  <div class="docs-nav__group">
+    <p class="docs-nav__title"><a href="#foundations">foundations</a></p>
+    <ul>
+      <li><a href="#colour">colour</a></li>
+      <li><a href="#status-colours">status colours</a></li>
+      <li><a href="#type">type</a></li>
+      <li><a href="#spacing">spacing</a></li>
+      <li><a href="#radius">radius</a></li>
+      <li><a href="#motion">motion</a></li>
+      <li><a href="#icons">icons</a></li>
+      <li><a href="#layout">layout</a></li>
+    </ul>
+  </div>
+  <div class="docs-nav__group">
+    <p class="docs-nav__title"><a href="#components">components</a></p>
+    <ul>
+      <li><a href="#actions">actions</a></li>
+      <li><a href="#inputs">inputs</a></li>
+      <li><a href="#feedback">feedback</a></li>
+      <li><a href="#overlays">overlays</a></li>
+      <li><a href="#data">data</a></li>
+      <li><a href="#charts">charts</a></li>
+      <li><a href="#content">content</a></li>
+      <li><a href="#states">states</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main id="main" class="docs-main">
+
+<header class="docs-hero yf-stack yf-stack--lg" id="top">
+  <div class="yf-stack yf-stack--sm">
+    <p class="yf-eyebrow">design system</p>
+    <h1>yf</h1>
+  </div>
+  <p class="yf-text-lg docs-lead">The visual language of yoanfaure.com, extended for tools. Ink on paper, a square layout, plain CSS and a little vanilla JavaScript. Nothing to install, nothing to build.</p>
+  <dl class="yf-kv">
+    <div><dt>version</dt><dd class="yf-mono">{{VERSION_SHOWN}}, pinned: there is no latest</dd></div>
+    <div><dt>made for</dt><dd>webapps on *.yoanfaure.com, and Claude artifacts</dd></div>
+    <div><dt>licence</dt><dd>MIT. Inter and JetBrains Mono are OFL 1.1. Icons are Phosphor, MIT.</dd></div>
+    <div><dt>source</dt><dd><a href="https://github.com/y0anfa/yf">github.com/y0anfa/yf</a></dd></div>
+  </dl>
+<!--include dev-notice-->
+</header>
+
+<!-- ============================ GETTING STARTED ============================ -->
+
+<section class="docs-group" aria-labelledby="getting-started">
+<h2 id="getting-started">Getting started<a class="yf-anchor" href="#getting-started" aria-label="Link to this section"></a></h2>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="install">Install<a class="yf-anchor" href="#install" aria-label="Link to this section"></a></h3>
+  <p>Link a pinned version. There is nothing to install and nothing to build.</p>
+<!--code html-->
+<link rel="stylesheet" href="{{CDN}}/yf.css">
+<script src="{{CDN}}/yf.js" defer></script>
+<!--/code-->
+  <p><code>yf.css</code> is everything: tokens, base styles, layout and every component. It finds Inter and JetBrains Mono in <code>fonts/</code> next to itself, so there is no second stylesheet and no font request to set up. <code>yf.js</code> is optional. Every component reads correctly without it; the script adds the theme switch, tabs, menus, dialogs, toasts, sortable tables, copy buttons, sparklines, charts and the topo field.</p>
+  <p>Every file under a version is served with open CORS and a one-year immutable cache, so an app on another subdomain loads them straight from here.</p>
+  <p><code>yf.js</code> applies the saved theme the moment it runs. In <code>&lt;head&gt;</code> without <code>defer</code> that happens before first paint; with <code>defer</code>, a reader who chose dark can see one light frame on reload. This page loads it without <code>defer</code> for that reason.</p>
+  <p>yf runs under a strict content security policy: no inline script, no inline style, no <code>eval</code>, no <code>innerHTML</code> with data. This page is served with <code>default-src 'none'</code>, <code>script-src 'self'</code> and <code>style-src 'self'</code>, and it works. If you load it from here, your policy needs to allow this host:</p>
+<!--code http-->
+Content-Security-Policy: style-src 'self' https://ds.yoanfaure.com; script-src 'self' https://ds.yoanfaure.com; font-src https://ds.yoanfaure.com
+<!--/code-->
+  <h4 class="yf-eyebrow">a starting page</h4>
+<!--code html-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My tool</title>
+  <link rel="stylesheet" href="{{CDN}}/yf.css">
+  <script src="{{CDN}}/yf.js"></script>
+</head>
+<body>
+  <main class="yf-container yf-stack">
+    <h1>My tool</h1>
+    <button class="yf-button yf-button--primary" type="button">Get started</button>
+  </main>
+</body>
+</html>
+<!--/code-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="versions">Pinned versions only<a class="yf-anchor" href="#versions" aria-label="Link to this section"></a></h3>
+  <p>There is no <code>latest</code> alias, on purpose. A released version never changes: <code>{{CDN}}/yf.css</code> is the same file today and in five years, so a page that links it cannot break because yf moved. To upgrade, change the version in the URL, then look at the page.</p>
+  <p>Versions follow semver. Patch releases fix bugs. Minor releases add components, variants and tokens. Major releases may rename or remove classes, tokens, data attributes or JavaScript APIs. Before 1.0 a minor release may break things too. A fix never reaches a page that pins an older version; that is the trade.</p>
+  <p>This page documents <code>{{VERSION_SHOWN}}</code>. Released versions:</p>
+<!--include releases-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="sprite">Icon sprite<a class="yf-anchor" href="#sprite" aria-label="Link to this section"></a></h3>
+  <p>Icons are Phosphor Regular in one SVG sprite, <code>icons/yf-icons.svg</code>. Reference a symbol with <code>&lt;use&gt;</code>. An icon takes its size from CSS (1rem, or <code>.yf-icon--sm</code>, <code>--lg</code>, <code>--xl</code>) and its colour from the text around it. The whole set is in <a href="#icons">icons</a>.</p>
+<!--example html-->
+<div class="yf-cluster">
+  <svg class="yf-icon yf-icon--sm" aria-hidden="true"><use href="{{SPRITE}}#shield-check"/></svg>
+  <svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#shield-check"/></svg>
+  <svg class="yf-icon yf-icon--lg" aria-hidden="true"><use href="{{SPRITE}}#shield-check"/></svg>
+  <svg class="yf-icon yf-icon--xl" aria-hidden="true"><use href="{{SPRITE}}#shield-check"/></svg>
+  <svg class="yf-icon yf-icon--lg" role="img" aria-label="Verified"><use href="{{SPRITE}}#check-circle"/></svg>
+</div>
+<!--/example-->
+  <p>An icon beside text is decoration: <code>aria-hidden="true"</code>. An icon on its own needs <code>role="img"</code> and an <code>aria-label</code>.</p>
+  <div class="yf-banner" role="note"><span class="yf-banner__icon" aria-hidden="true"></span><div class="yf-banner__body"><p class="yf-banner__title">From another origin, yf.js brings the sprite in</p><p>Browsers refuse a <code>&lt;use&gt;</code> that points at another origin, so <code>href="{{CDN}}/icons/yf-icons.svg#check"</code> alone would not work from your app. <code>yf.js</code> handles it: when the page has a <code>.yf-icon</code>, it fetches the sprite that sits next to it, keeps only the drawing, and puts the symbols in the page once. Write <code>&lt;use href="#check"&gt;</code>. A full sprite URL is rewritten to <code>#check</code> too, but the browser logs one refusal before that, so prefer the short form. Add the sprite's origin to your <code>connect-src</code>. To skip the fetch, set <code>&lt;html data-yf-icons="off"&gt;</code> and paste the symbols you use into the page, which is what Claude artifacts do.</p></div></div>
+<!--code html-->
+<svg class="yf-sprite" aria-hidden="true">
+  <!-- paste the <symbol> elements from yf-icons.svg here -->
+</svg>
+
+<svg class="yf-icon" aria-hidden="true"><use href="#check"/></svg>
+<!--/code-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="artifacts">Using yf in Claude artifacts<a class="yf-anchor" href="#artifacts" aria-label="Link to this section"></a></h3>
+  <p>An artifact cannot load an external stylesheet: its content security policy allows stylesheets from Google Fonts only. So an artifact inlines <code>yf.css</code> in a <code>&lt;style&gt;</code> block and loads Inter and JetBrains Mono from Google Fonts.</p>
+  <p>The three <code>@font-face</code> rules at the top of <code>yf.css</code> point at <code>fonts/</code> by a relative URL, which will not resolve in an artifact. Delete them from the inlined copy, and the Google Fonts families of the same names apply. Inline <code>yf.js</code> the same way if the artifact needs behaviour, and paste the sprite inline as shown in <a href="#sprite">icon sprite</a>.</p>
+<!--code html-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* the contents of yf.css, without its three @font-face rules */
+</style>
+<!--/code-->
+  <p>The result is the same page. Only where the files come from changes.</p>
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="theming">Theming<a class="yf-anchor" href="#theming" aria-label="Link to this section"></a></h3>
+  <p>Light and dark. The system decides, unless <code>data-theme="light"</code> or <code>data-theme="dark"</code> is set on <code>&lt;html&gt;</code>. With <code>yf.js</code>, a toggle sets it and remembers the choice in <code>localStorage</code> under <code>yf-theme</code>. The switch is one short cross-fade, and none when the reader prefers reduced motion. Try these; they change this page.</p>
+<!--example html-->
+<div class="yf-button-group" role="group" aria-label="Theme">
+  <button class="yf-button" type="button" data-yf-theme-toggle="light">Light</button>
+  <button class="yf-button" type="button" data-yf-theme-toggle="system">System</button>
+  <button class="yf-button" type="button" data-yf-theme-toggle="dark">Dark</button>
+</div>
+<!--/example-->
+<!--code js-->
+yf.theme.set('dark');      // 'light', 'dark' or 'system'
+yf.theme.toggle();         // flips between light and dark
+yf.theme.get();            // what the reader saved: 'light', 'dark' or 'system'
+yf.theme.resolved();       // what is shown: 'light' or 'dark'
+document.addEventListener('yf:theme', (e) => console.log(e.detail)); // { theme, resolved }
+<!--/code-->
+  <p>Tokens are set on <code>:root</code>, so a theme applies to the whole page; a section cannot take the other one.</p>
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="layers">Cascade layers<a class="yf-anchor" href="#layers" aria-label="Link to this section"></a></h3>
+  <p>Everything yf ships sits in a cascade layer, in this order, weakest first: <code>yf.reset</code>, <code>yf.tokens</code>, <code>yf.base</code>, <code>yf.layout</code>, <code>yf.components</code>, <code>yf.utilities</code>. CSS that is in no layer beats every layer, whatever its specificity, so your app's CSS always wins. No <code>!important</code>, no selector arms race.</p>
+<!--code css-->
+/* unlayered, so these win */
+:root { --yf-radius: 6px; }                 /* change a token */
+.yf-button { letter-spacing: 0.02em; }      /* change a component */
+<!--/code-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="javascript">JavaScript<a class="yf-anchor" href="#javascript" aria-label="Link to this section"></a></h3>
+  <p>Behaviour is added by <code>data-yf-*</code> attributes and starts on <code>DOMContentLoaded</code>. Each part is also on <code>window.yf</code>. Markup you add later: call the matching <code>init(root)</code> with the new element.</p>
+  <div class="yf-table-wrap" tabindex="0" role="region" aria-label="JavaScript behaviours">
+    <table class="yf-table">
+      <thead><tr><th scope="col">behaviour</th><th scope="col">markup</th><th scope="col">api</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">theme</th><td><code>data-yf-theme-toggle="light|dark|system"</code></td><td><code>yf.theme.set(mode)</code>, <code>get()</code>, <code>resolved()</code>, <code>toggle()</code>; event <code>yf:theme</code></td></tr>
+        <tr><th scope="row">toast</th><td>none</td><td><code>yf.toast({ message, status, action, timeout })</code>, <code>yf.toast.dismissAll()</code></td></tr>
+        <tr><th scope="row">dialog</th><td><code>data-yf-dialog-open="id"</code>, <code>data-yf-dialog-close</code>, <code>data-yf-dialog-static</code></td><td><code>yf.dialog.open(id)</code>, <code>yf.dialog.close(id)</code></td></tr>
+        <tr><th scope="row">tabs</th><td><code>data-yf-tabs</code></td><td><code>yf.tabs.init(root)</code>, <code>yf.tabs.select(tab)</code>; event <code>yf:tabchange</code></td></tr>
+        <tr><th scope="row">menu</th><td><code>popover</code> on <code>.yf-menu</code>, <code>data-yf-keep-open</code></td><td><code>yf.menu.init(root)</code></td></tr>
+        <tr><th scope="row">tooltip</th><td><code>data-yf-tooltip</code>, <code>data-yf-tooltip-pos</code></td><td><code>yf.tooltip.init(root)</code></td></tr>
+        <tr><th scope="row">sortable table</th><td><code>data-yf-sortable</code>, <code>data-sort-value</code></td><td><code>yf.table.init(root)</code>, <code>yf.table.sort(table, column, direction)</code>; event <code>yf:sort</code></td></tr>
+        <tr><th scope="row">copy</th><td><code>data-yf-copy</code>, <code>data-yf-copy-label</code>, <code>data-yf-copied</code></td><td><code>yf.copy.init(root)</code>, <code>yf.copy.write(text)</code></td></tr>
+        <tr><th scope="row">sparkline</th><td><code>data-yf-sparkline</code>, <code>data-yf-threshold</code>, <code>data-yf-label</code></td><td><code>yf.sparkline.init(root)</code>, <code>yf.sparkline.draw(host)</code></td></tr>
+        <tr><th scope="row">chart</th><td><code>data-yf-chart="line|bar"</code> with a <code>&lt;script type="application/json"&gt;</code> spec inside</td><td><code>yf.chart.line(el, spec)</code>, <code>yf.chart.bar(el, spec)</code>, each returning <code>{ update(spec), destroy() }</code>; <code>yf.chart.init(root)</code></td></tr>
+        <tr><th scope="row">topo field</th><td><code>data-yf-field</code>, <code>data-yf-seed</code>, <code>data-yf-static</code>, <code>data-yf-pointer="off"</code></td><td><code>yf.field.mount(el, options)</code>, <code>yf.field.init(root)</code>, <code>yf.field.destroy(el)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</section>
+
+<!-- ============================ FOUNDATIONS ============================ -->
+
+<section class="docs-group" aria-labelledby="foundations">
+<h2 id="foundations">Foundations<a class="yf-anchor" href="#foundations" aria-label="Link to this section"></a></h2>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="colour">Colour<a class="yf-anchor" href="#colour" aria-label="Link to this section"></a></h3>
+  <p>Ink on paper, in two themes. Nothing is coloured to look nice: the only colours in yf are the three status colours below. The primary action is solid ink, and focus is a 2px ink outline with a 2px offset.</p>
+<!--include colour-->
+  <p class="yf-muted yf-text-sm">Text needs 4.5:1 against paper and the edge of a control 3:1. Rules and fills are decoration, so they are quieter on purpose. Ratios are computed from the tokens in this release's <code>yf.css</code>, rounded down. <code>--yf-primary</code> is <code>--yf-fg</code> and <code>--yf-on-primary</code> is <code>--yf-bg</code>.</p>
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="status-colours">Status colours<a class="yf-anchor" href="#status-colours" aria-label="Link to this section"></a></h3>
+  <p><strong>Status only.</strong> Muted red, amber and green mean one thing: status. They appear on pills, errors, toasts, banner marks and chart thresholds. They are never decoration, never brand, and never alone: a status is always text plus a form, a label, an icon or a glyph.</p>
+  <div class="yf-cluster">
+    <span class="yf-status yf-status--danger">Critical</span>
+    <span class="yf-status yf-status--warning">Warning</span>
+    <span class="yf-status yf-status--success">Passed</span>
+    <span class="yf-status yf-status--neutral">Ignored</span>
+  </div>
+<!--include status-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="type">Type<a class="yf-anchor" href="#type" aria-label="Link to this section"></a></h3>
+  <p>Inter for everything, self-hosted, as a variable font with its italic. JetBrains Mono, at one weight (400), for code, ids, hashes and numbers in tables. Headings are bold and tight: <code>h1</code> is 3xl, <code>h2</code> 2xl, <code>h3</code> xl, <code>h4</code> lg, <code>h5</code> base at 600, and <code>h6</code> small and muted.</p>
+<!--include type-->
+<!--include type-more-->
+  <h4 class="yf-eyebrow">utilities</h4>
+<!--example html-->
+<div class="yf-stack yf-stack--sm">
+  <p class="yf-eyebrow">Eyebrow: a small label above a section</p>
+  <p>Body text in Inter, with <code>inline code</code> and <kbd>⌘</kbd> <kbd>K</kbd>.</p>
+  <p class="yf-muted">Muted, for the small stuff.</p>
+  <p class="yf-mono">a1b2c3d  mono, for ids and hashes</p>
+  <p class="yf-num">1,234.50  tabular figures</p>
+  <p class="yf-bold">Bold</p>
+</div>
+<!--/example-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="spacing">Spacing<a class="yf-anchor" href="#spacing" aria-label="Link to this section"></a></h3>
+  <p>One scale for gaps and padding. Space between siblings is always <code>gap</code>, never a margin: use <a href="#layout">stack, cluster and grid</a>.</p>
+<!--include space-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="radius">Radius<a class="yf-anchor" href="#radius" aria-label="Link to this section"></a></h3>
+  <p>The layout is square: pages, tables, panels and dialogs have radius 0 and 1px rules. Controls (buttons, inputs, pills, menus and toasts) have 3px. Overlays are the only things that cast a shadow.</p>
+  <div class="docs-demo__live docs-radius">
+    <div class="docs-radius__panel">layout: 0</div>
+    <button class="yf-button" type="button">control: 3px</button>
+    <span class="yf-status">pill</span>
+  </div>
+<!--include shape-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="motion">Motion<a class="yf-anchor" href="#motion" aria-label="Link to this section"></a></h3>
+  <p>Calm and functional. Three durations, an ease-out for things arriving and an ease-in for things leaving. With <code>prefers-reduced-motion: reduce</code> transitions drop out and the field shows one still frame.</p>
+  <div class="docs-demo__live docs-motion" data-docs-motion>
+    <button class="yf-button" type="button" data-docs-play>play</button>
+    <div class="docs-motion__row"><span class="yf-mono yf-muted">--yf-dur-fast</span><span class="docs-motion__track"><span class="docs-motion__dot docs-motion__dot--fast"></span></span></div>
+    <div class="docs-motion__row"><span class="yf-mono yf-muted">--yf-dur</span><span class="docs-motion__track"><span class="docs-motion__dot docs-motion__dot--base"></span></span></div>
+    <div class="docs-motion__row"><span class="yf-mono yf-muted">--yf-dur-slow</span><span class="docs-motion__track"><span class="docs-motion__dot docs-motion__dot--slow"></span></span></div>
+  </div>
+<!--include motion-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="icons">Icons<a class="yf-anchor" href="#icons" aria-label="Link to this section"></a></h3>
+  <p>{{ICON_COUNT}} icons: a curated subset of Phosphor Regular (MIT), in one sprite. The copy button copies the name; how to use it is in <a href="#sprite">icon sprite</a>.</p>
+<!--include icons-->
+</section>
+
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="layout">Layout<a class="yf-anchor" href="#layout" aria-label="Link to this section"></a></h3>
+  <p>Small boxes that place things. Spacing is always <code>gap</code>. Each has a custom property for the one-off case: <code>--yf-stack-gap</code>, <code>--yf-cluster-gap</code>, <code>--yf-grid-min</code>, <code>--yf-split-side</code>.</p>
+  <h4 class="yf-eyebrow">stack and cluster</h4>
+<!--example html +tiles-->
+<div class="yf-stack">
+  <div>stack: children in a column</div>
+  <div>with a gap between them</div>
+</div>
+<div class="yf-cluster">
+  <span>cluster</span><span>items that</span><span>wrap</span><span>when they</span><span>run out of room</span>
+</div>
+<div class="yf-cluster yf-cluster--between">
+  <span>--between</span><span>pushes to the ends</span>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">grid and split</h4>
+<!--example html +tiles-->
+<div class="yf-grid yf-grid--sm">
+  <div>grid</div><div>as many columns</div><div>as fit</div><div>none narrower</div><div>than the minimum</div>
+</div>
+<div class="yf-split">
+  <div>split: sidebar</div>
+  <div>main. They stack when main would get under half the width, in the panel's own width, not the screen's.</div>
+</div>
+<!--/example-->
+  <p>The sidebar is 15rem; <code>.yf-split--wide-side</code> makes it 20rem (a search with its filters). <code>.yf-split--end</code> puts it last.</p>
+  <h4 class="yf-eyebrow">container, column, divider</h4>
+<!--example html +tiles-->
+<div class="yf-stack">
+  <div class="yf-column"><div>column: the reading measure (38rem), centred</div></div>
+  <hr class="yf-divider">
+  <hr class="yf-divider yf-divider--strong">
+  <div class="yf-cluster"><span>a</span><div class="yf-divider yf-divider--vertical" role="separator"></div><span>b</span></div>
+</div>
+<!--/example-->
+  <p><code>.yf-container</code> is the app width with gutters: 72rem, <code>--narrow</code> 52rem, <code>--wide</code> 88rem for a table with many columns. <code>.yf-page</code> on the outer wrapper gives the page its room above and below. These presets exist because a strict CSP forbids a <code>style</code> attribute; any other value is <code>--yf-container</code> in a stylesheet. <code>.yf-skip-link</code> goes first on a page and shows when it has focus.</p>
+  <h4 class="yf-eyebrow">scroller</h4>
+<!--example html-->
+<div class="yf-scroller" aria-label="Tags">
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="true">all</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">cloud</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">code review</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">detection</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">iam</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">incident</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">policy</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">threat model</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">vendors</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">vulnerabilities</button>
+</div>
+<!--/example-->
+  <p>One row that scrolls sideways instead of wrapping. The scrollbar is hidden, so the edge that has more to show fades out. Tab lists, and the stats row on a phone, scroll the same way.</p>
+</section>
+</section>
+
+<!-- ============================ COMPONENTS ============================ -->
+
+<section class="docs-group" aria-labelledby="components">
+<h2 id="components">Components<a class="yf-anchor" href="#components" aria-label="Link to this section"></a></h2>
+<p class="docs-group__intro">Every component has hover, focus, active and disabled states, and <code>aria-invalid</code> or <code>aria-busy</code> where they apply. Each example below is live, and the markup under it is the markup that runs.</p>
+
+<!-- ---------------- actions ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="actions">Actions<a class="yf-anchor" href="#actions" aria-label="Link to this section"></a></h3>
+  <p>One primary button per view. Secondary is the default. Ghost is for the quiet second action beside a primary. Danger is for destructive actions, and should lead to a confirmation or an undo.</p>
+  <h4 class="yf-eyebrow">variants</h4>
+<!--example html-->
+<div class="yf-cluster">
+  <button class="yf-button yf-button--primary" type="button">Save changes</button>
+  <button class="yf-button" type="button">Cancel</button>
+  <button class="yf-button yf-button--ghost" type="button">Skip for now</button>
+  <button class="yf-button yf-button--danger" type="button">Delete report</button>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">compact</h4>
+<!--example html-->
+<div class="yf-cluster yf-cluster--sm">
+  <button class="yf-button yf-button--sm" type="button">Export</button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="true">Open <span class="yf-count">12</span></button>
+  <button class="yf-button yf-button--sm" type="button" aria-pressed="false">Fixed <span class="yf-count">48</span></button>
+  <button class="yf-button yf-button--sm yf-button--ghost yf-button--close" type="button" aria-label="Clear filters"></button>
+</div>
+<!--/example-->
+  <p><code>.yf-button--sm</code> is 28px tall, for filter chips and dense toolbars; a chip is a compact button with <code>aria-pressed</code>. <code>.yf-count</code> puts a number after a label, in a button, a tab or a nav link.</p>
+  <h4 class="yf-eyebrow">icons</h4>
+<!--example html-->
+<div class="yf-cluster">
+  <button class="yf-button yf-button--primary" type="button"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#plus"/></svg>New report</button>
+  <button class="yf-button" type="button">Next<svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#arrow-right"/></svg></button>
+  <button class="yf-button yf-button--icon" type="button" aria-label="Copy" data-yf-tooltip="Copy"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#copy"/></svg></button>
+  <button class="yf-button yf-button--ghost yf-button--icon" type="button" aria-label="Settings"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#gear-six"/></svg></button>
+  <button class="yf-button yf-button--danger yf-button--icon" type="button" aria-label="Delete"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#trash"/></svg></button>
+  <button class="yf-button yf-button--ghost yf-button--close" type="button" aria-label="Close"></button>
+</div>
+<!--/example-->
+  <p>An icon-only button needs an <code>aria-label</code>. <code>.yf-button--close</code> draws its own cross and needs no sprite.</p>
+  <h4 class="yf-eyebrow">states</h4>
+<!--example html-->
+<div class="yf-cluster">
+  <button class="yf-button yf-button--primary" type="button" disabled>Disabled</button>
+  <button class="yf-button" type="button" aria-disabled="true">Aria disabled</button>
+  <button class="yf-button" type="button" aria-busy="true">Saving</button>
+  <button class="yf-button yf-button--danger" type="button" aria-busy="true">Deleting</button>
+  <button class="yf-button" type="button" aria-pressed="true">Pressed</button>
+  <a class="yf-button" href="#actions">Anchor button</a>
+</div>
+<!--/example-->
+  <p>Prefer <code>aria-disabled="true"</code> when the button should stay focusable to explain itself. <code>aria-busy="true"</code> swaps the label for a spinner and keeps the width. <code>aria-pressed="true"</code> makes a toggle and fills it with ink.</p>
+  <h4 class="yf-eyebrow">groups and links</h4>
+<!--example html-->
+<div class="yf-cluster yf-cluster--lg">
+  <div class="yf-button-group" role="group" aria-label="Range">
+    <button class="yf-button" type="button" aria-pressed="true">Day</button>
+    <button class="yf-button" type="button" aria-pressed="false">Week</button>
+    <button class="yf-button" type="button" aria-pressed="false">Month</button>
+  </div>
+  <div class="yf-button-group" role="group" aria-label="Page">
+    <button class="yf-button yf-button--icon" type="button" aria-label="Previous"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#caret-left"/></svg></button>
+    <button class="yf-button yf-button--icon" type="button" aria-label="Next"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#caret-right"/></svg></button>
+  </div>
+  <button class="yf-link" type="button">A button that reads as a link</button>
+  <a class="yf-link" href="#actions">An anchor link</a>
+</div>
+<!--/example-->
+</section>
+
+<!-- ---------------- inputs ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="inputs">Inputs<a class="yf-anchor" href="#inputs" aria-label="Link to this section"></a></h3>
+  <p>Every control has a visible label. Help sits under the control. When a value is wrong, set <code>aria-invalid="true"</code> and show a <code>.yf-error</code> beside the help, tied to the control with <code>aria-describedby</code>. The error starts with a "!", so it never relies on colour.</p>
+  <h4 class="yf-eyebrow">text fields</h4>
+<!--example html-->
+<div class="yf-grid">
+  <div class="yf-field">
+    <label for="in-name">Name</label>
+    <input class="yf-input" id="in-name" type="text" placeholder="Yoan Faure" autocomplete="off" aria-describedby="in-name-help">
+    <p class="yf-help" id="in-name-help">Shown on reports you share.</p>
+  </div>
+  <div class="yf-field">
+    <label for="in-email">Email</label>
+    <input class="yf-input" id="in-email" type="email" value="not-an-email" aria-invalid="true" aria-describedby="in-email-error">
+    <p class="yf-error" id="in-email-error">Enter an address like name@example.com.</p>
+  </div>
+  <div class="yf-field">
+    <label for="in-locked">Disabled</label>
+    <input class="yf-input" id="in-locked" type="text" value="Cannot edit" disabled>
+  </div>
+  <div class="yf-field">
+    <label for="in-ro">Read only</label>
+    <input class="yf-input" id="in-ro" type="text" value="a1b2c3d4e5f6" readonly>
+  </div>
+  <div class="yf-field">
+    <label for="in-region">Region</label>
+    <select class="yf-select" id="in-region">
+      <option>Europe (Paris)</option>
+      <option>US East (Virginia)</option>
+      <option>Asia Pacific (Tokyo)</option>
+    </select>
+  </div>
+  <div class="yf-field">
+    <label for="in-notes">Notes</label>
+    <textarea class="yf-textarea" id="in-notes" placeholder="What did you find?"></textarea>
+  </div>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">choices</h4>
+<!--example html-->
+<div class="yf-grid">
+  <fieldset class="yf-fieldset">
+    <legend>Notify me by</legend>
+    <label class="yf-checkbox"><input type="checkbox" checked><span>Email</span></label>
+    <label class="yf-checkbox"><input type="checkbox"><span>Slack</span></label>
+    <label class="yf-checkbox"><input type="checkbox" id="in-mixed"><span>Everything (mixed)</span></label>
+    <label class="yf-checkbox"><input type="checkbox" disabled><span>SMS (disabled)</span></label>
+  </fieldset>
+  <fieldset class="yf-fieldset">
+    <legend>Frequency</legend>
+    <label class="yf-radio"><input type="radio" name="in-freq" checked><span>Daily</span></label>
+    <label class="yf-radio"><input type="radio" name="in-freq"><span>Weekly</span></label>
+    <label class="yf-radio"><input type="radio" name="in-freq" disabled><span>Never (disabled)</span></label>
+  </fieldset>
+  <fieldset class="yf-fieldset">
+    <legend>Preferences</legend>
+    <label class="yf-switch"><input type="checkbox" role="switch" checked><span>Weekly digest</span></label>
+    <label class="yf-switch"><input type="checkbox" role="switch"><span>Product news</span></label>
+    <label class="yf-switch"><input type="checkbox" role="switch" disabled><span>Disabled</span></label>
+  </fieldset>
+</div>
+<!--/example-->
+<!--code js-->
+document.getElementById('in-mixed').indeterminate = true;   // "mixed" can only be set from script
+<!--/code-->
+  <h4 class="yf-eyebrow">inline fields</h4>
+  <p><code>.yf-field--inline</code> puts the label beside the control, and stacks under 36rem. <code>.yf-fieldset--inline</code> lays options in a row.</p>
+<!--example html-->
+<div class="yf-stack">
+  <div class="yf-field yf-field--inline">
+    <label for="in-display">Display name</label>
+    <input class="yf-input" id="in-display" type="text" value="Yoan">
+    <p class="yf-help">Visible to your team.</p>
+  </div>
+  <fieldset class="yf-fieldset yf-fieldset--inline" aria-describedby="in-sev-error">
+    <legend>Severity</legend>
+    <label class="yf-radio"><input type="radio" name="in-sev" aria-invalid="true"><span>Low</span></label>
+    <label class="yf-radio"><input type="radio" name="in-sev" aria-invalid="true"><span>Medium</span></label>
+    <label class="yf-radio"><input type="radio" name="in-sev" aria-invalid="true"><span>High</span></label>
+    <p class="yf-error" id="in-sev-error">Choose a severity.</p>
+  </fieldset>
+</div>
+<!--/example-->
+</section>
+
+<!-- ---------------- feedback ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="feedback">Feedback<a class="yf-anchor" href="#feedback" aria-label="Link to this section"></a></h3>
+  <p>A toast confirms something that already happened, then goes away. A banner stays until the situation changes. A tooltip adds a hint to a control that already has a name; it never carries the only copy of anything. Status colour shows on the mark and the rule only; the words stay ink.</p>
+  <h4 class="yf-eyebrow">banners</h4>
+<!--example html-->
+<div class="yf-stack yf-stack--sm">
+  <div class="yf-banner" role="status">
+    <span class="yf-banner__icon" aria-hidden="true"></span>
+    <div class="yf-banner__body">
+      <p class="yf-banner__title">Heads up</p>
+      <p>The neutral note is ink. <a href="#feedback">A link inside</a> still inverts.</p>
+    </div>
+  </div>
+  <div class="yf-banner yf-banner--info" role="status">
+    <span class="yf-banner__icon" aria-hidden="true"></span>
+    <div class="yf-banner__body">
+      <p>Scans run every night at 02:00 UTC.</p>
+    </div>
+  </div>
+  <div class="yf-banner yf-banner--success" role="status">
+    <span class="yf-banner__icon" aria-hidden="true"></span>
+    <div class="yf-banner__body">
+      <p class="yf-banner__title">Report sent</p>
+      <p>Four people can now open it.</p>
+    </div>
+  </div>
+  <div class="yf-banner yf-banner--warning" role="status">
+    <span class="yf-banner__icon" aria-hidden="true"></span>
+    <div class="yf-banner__body">
+      <p class="yf-banner__title">Quota almost used</p>
+      <p>You have used 92% of this month's scans.</p>
+    </div>
+  </div>
+  <div class="yf-banner yf-banner--danger" role="alert">
+    <span class="yf-banner__icon" aria-hidden="true"></span>
+    <div class="yf-banner__body">
+      <p class="yf-banner__title">Scan failed</p>
+      <p>The repository could not be reached. Check the access token and try again.</p>
+    </div>
+  </div>
+</div>
+<!--/example-->
+  <p>Keep the mark's span empty and it draws its own glyph, so it needs no sprite. Use <code>role="alert"</code> for a danger banner that appears after the page loads and <code>role="status"</code> for the others.</p>
+  <h4 class="yf-eyebrow">toasts</h4>
+  <p>Call <code>yf.toast()</code>. The region is created when the page loads, because a live region has to exist before it is filled. While a modal dialog is open the page behind it is inert, so toasts go to a region inside the dialog, above it and still clickable. A danger toast is <code>role="alert"</code>. At most five show. The clock stops while the pointer or focus is on a toast.</p>
+  <div class="docs-demo__live">
+    <div class="yf-cluster yf-cluster--sm">
+      <button class="yf-button" type="button" data-docs-toast="">Plain</button>
+      <button class="yf-button" type="button" data-docs-toast="info">Info</button>
+      <button class="yf-button" type="button" data-docs-toast="success">Success with undo</button>
+      <button class="yf-button" type="button" data-docs-toast="warning">Warning</button>
+      <button class="yf-button" type="button" data-docs-toast="danger">Danger</button>
+      <button class="yf-button yf-button--ghost" type="button" data-docs-toast-clear>Clear all</button>
+    </div>
+  </div>
+<!--code js-->
+yf.toast('Copied to the clipboard.');
+yf.toast({
+  message: 'Report saved.',
+  status: 'success',                        // 'info', 'success', 'warning' or 'danger'
+  action: { label: 'Undo', onClick: () => restore() },
+  timeout: 8000,                            // ms; 0 keeps it until dismissed
+});
+yf.toast.dismissAll();
+<!--/code-->
+  <p>The markup, for a toast you render yourself or want to see at rest:</p>
+<!--example html-->
+<div class="yf-grid yf-grid--lg">
+  <div class="yf-toast"><div class="yf-toast__body"><p class="yf-toast__message">Copied to the clipboard.</p></div><button class="yf-button yf-button--ghost yf-button--close yf-toast__dismiss" type="button" aria-label="Dismiss"></button></div>
+  <div class="yf-toast yf-toast--success"><span class="yf-toast__icon" aria-hidden="true"></span><div class="yf-toast__body"><p class="yf-toast__message">Report saved.</p></div><button class="yf-link yf-toast__action" type="button">Undo</button><button class="yf-button yf-button--ghost yf-button--close yf-toast__dismiss" type="button" aria-label="Dismiss"></button></div>
+  <div class="yf-toast yf-toast--danger"><span class="yf-toast__icon" aria-hidden="true"></span><div class="yf-toast__body"><p class="yf-toast__message">Could not delete the report because it is shared with 3 teams.</p></div><button class="yf-button yf-button--ghost yf-button--close yf-toast__dismiss" type="button" aria-label="Dismiss"></button></div>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">tooltips</h4>
+  <p>CSS only; the tip shows on hover and on keyboard focus. <code>yf.js</code> adds Escape to dismiss it and exposes it as the description. Placement is <code>data-yf-tooltip-pos</code>: top (the default), bottom, left or right. An <code>input</code> or an <code>svg</code> cannot have a tip of its own; wrap it.</p>
+<!--example html +roomy-->
+<div class="yf-cluster yf-cluster--lg">
+  <button class="yf-button" type="button" data-yf-tooltip="Appears above">Top</button>
+  <button class="yf-button" type="button" data-yf-tooltip="Appears below" data-yf-tooltip-pos="bottom">Bottom</button>
+  <button class="yf-button" type="button" data-yf-tooltip="Appears on the left" data-yf-tooltip-pos="left">Left</button>
+  <button class="yf-button" type="button" data-yf-tooltip="Appears on the right" data-yf-tooltip-pos="right">Right</button>
+</div>
+<!--/example-->
+</section>
+
+<!-- ---------------- overlays ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="overlays">Overlays<a class="yf-anchor" href="#overlays" aria-label="Link to this section"></a></h3>
+  <p>A dialog stops the page for a decision that cannot wait. A menu holds the actions for one thing. Tabs split one view into peers. Dialog and menu are the platform's own <code>&lt;dialog&gt;</code> and <code>popover</code>, so Escape, focus return and the top layer come free. The three overlays (these two and the toast) share one look: paper, a 1px ink edge and the overlay shadow.</p>
+  <h4 class="yf-eyebrow">dialog</h4>
+<!--example html-->
+<div class="yf-cluster">
+  <button class="yf-button" type="button" data-yf-dialog-open="dlg-share" command="show-modal" commandfor="dlg-share">Share…</button>
+  <button class="yf-button yf-button--danger" type="button" data-yf-dialog-open="dlg-delete" command="show-modal" commandfor="dlg-delete">Delete…</button>
+</div>
+
+<dialog class="yf-dialog" id="dlg-share" aria-labelledby="dlg-share-title">
+  <div class="yf-dialog__header">
+    <h2 class="yf-dialog__title" id="dlg-share-title">Share this report</h2>
+    <button class="yf-button yf-button--ghost yf-button--close" type="button" data-yf-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="yf-dialog__body yf-stack">
+    <p>Anyone with the link can open it. They cannot edit.</p>
+    <div class="yf-field">
+      <label for="dlg-share-email">Email</label>
+      <input class="yf-input" id="dlg-share-email" type="email" placeholder="name@example.com">
+    </div>
+  </div>
+  <form class="yf-dialog__footer" method="dialog">
+    <button class="yf-button" value="cancel">Cancel</button>
+    <button class="yf-button yf-button--primary" value="share">Share</button>
+  </form>
+</dialog>
+
+<dialog class="yf-dialog" id="dlg-delete" role="alertdialog" aria-labelledby="dlg-delete-title" aria-describedby="dlg-delete-text">
+  <div class="yf-dialog__header">
+    <h2 class="yf-dialog__title" id="dlg-delete-title">Delete this report?</h2>
+    <button class="yf-button yf-button--ghost yf-button--close" type="button" data-yf-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="yf-dialog__body">
+    <p id="dlg-delete-text">This removes the report and its 14 findings for everyone. You cannot undo it.</p>
+  </div>
+  <div class="yf-dialog__footer">
+    <button class="yf-button" type="button" data-yf-dialog-close autofocus>Keep report</button>
+    <button class="yf-button yf-button--danger" type="button" data-yf-dialog-close>Delete report</button>
+  </div>
+</dialog>
+<!--/example-->
+  <p>A click on the backdrop closes a dialog; <code>data-yf-dialog-static</code> turns that off. In a destructive dialog, put <code>autofocus</code> on the safe button. <code>--yf-dialog-width</code> sets the width and <code>.yf-dialog--wide</code> is 44rem. From script: <code>yf.dialog.open('dlg-share')</code>. The dialog's <code>returnValue</code> is the value of the button that closed it.</p>
+  <h4 class="yf-eyebrow">menu</h4>
+<!--example html-->
+<div class="yf-cluster">
+  <button class="yf-button" type="button" popovertarget="menu-actions" id="menu-actions-trigger">Actions<svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#caret-down"/></svg></button>
+  <div class="yf-menu" id="menu-actions" popover aria-labelledby="menu-actions-trigger">
+    <p class="yf-menu__label">Report</p>
+    <button class="yf-menu__item" type="button"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#pencil-simple"/></svg>Rename<span class="yf-menu__shortcut">R</span></button>
+    <button class="yf-menu__item" type="button"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#copy"/></svg>Duplicate<span class="yf-menu__shortcut">⌘D</span></button>
+    <a class="yf-menu__item" href="#overlays"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#arrow-square-out"/></svg>Open in new tab</a>
+    <button class="yf-menu__item" type="button" disabled><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#download-simple"/></svg>Export (disabled)</button>
+    <div class="yf-menu__separator"></div>
+    <button class="yf-menu__item yf-menu__item--danger" type="button"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#trash"/></svg>Delete</button>
+  </div>
+</div>
+<!--/example-->
+  <p>Without <code>yf.js</code> the menu still opens and closes and its items are buttons. With it the menu gets <code>role="menu"</code>, arrow keys, Home and End, type-ahead and Tab to close. It closes after a choice, unless the item has <code>data-yf-keep-open</code>. Placement uses CSS anchor positioning, and the script places it where that is missing.</p>
+  <h4 class="yf-eyebrow">tabs</h4>
+<!--example html-->
+<div class="yf-tabs" data-yf-tabs>
+  <div role="tablist" aria-label="Report sections">
+    <button role="tab" id="tab-summary" aria-controls="panel-summary" aria-selected="true" type="button">Summary</button>
+    <button role="tab" id="tab-findings" aria-controls="panel-findings" aria-selected="false" tabindex="-1" type="button">Findings <span class="yf-count">14</span></button>
+    <button role="tab" id="tab-history" aria-controls="panel-history" aria-selected="false" tabindex="-1" type="button">History <span class="yf-count">31</span></button>
+    <button role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" type="button" disabled>Settings</button>
+  </div>
+  <div role="tabpanel" id="panel-summary" aria-labelledby="tab-summary" tabindex="0"><p>The summary. Arrow keys move between tabs; Home and End jump to the ends.</p></div>
+  <div role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" tabindex="0" hidden><p>Fourteen findings, newest first.</p></div>
+  <div role="tabpanel" id="panel-history" aria-labelledby="tab-history" tabindex="0" hidden><p>Every scan since March.</p></div>
+  <div role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" tabindex="0" hidden><p>Never shown: the tab is disabled.</p></div>
+</div>
+<!--/example-->
+  <p>Tabs need <code>yf.js</code> to switch. A <code>.yf-count</code> after a label takes the tab's colour. The tab named by the URL hash is selected on load. When the list is wider than its box it scrolls, its far edge fades, and the selected tab scrolls into view. Filter tabs can all point at one panel (the same <code>aria-controls</code>): it stays shown, and the page filters it on <code>yf:tabchange</code>.</p>
+</section>
+
+<!-- ---------------- data ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="data">Data<a class="yf-anchor" href="#data" aria-label="Link to this section"></a></h3>
+  <p>Tables hold records and stats hold one number each. Numbers are right-aligned and tabular, ids are mono, and a status is always text plus a form.</p>
+  <h4 class="yf-eyebrow">table</h4>
+  <p>Ruled, no boxes. Click a header to sort: ascending, descending, then the original order; <code>data-yf-sort-first="descending"</code> on a header starts that column high to low. Numbers sort as numbers and text sorts naturally ("item 2" before "item 10"). Without <code>yf.js</code> the headers are plain. A text cell keeps 7rem so it never squeezes under a word or two; a cell with any <code>data-type</code> (yours too, such as <code>pill</code> or <code>actions</code>) sizes to its content, and <code>--yf-cell-min</code> on a column's cells changes the minimum. <code>.yf-wide</code> on the cells of the column that carries the sentence (a title) keeps 14rem. The <code>.yf-table__empty</code> row shows while no other row is visible, rows a filter has <code>hidden</code> included. A sticky-header wrap is 28rem tall; <code>.yf-table-wrap--tall</code> makes it 40rem. Put a wide table in a <code>.yf-table-wrap</code> that scrolls sideways, with <code>tabindex="0"</code> so the keyboard can scroll it.</p>
+<!--example html-->
+<div class="yf-table-wrap" tabindex="0" role="region" aria-label="Findings">
+  <table class="yf-table" data-yf-sortable>
+    <caption>6 findings, last run 12:04 UTC</caption>
+    <thead>
+      <tr>
+        <th scope="col" aria-sort="none">Check</th>
+        <th scope="col" aria-sort="none">Asset</th>
+        <th scope="col" aria-sort="none" class="yf-num">Age (days)</th>
+        <th scope="col" aria-sort="none">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Public S3 bucket</td><td class="yf-mono">s3://billing-exports</td><td class="yf-num">112</td><td><span class="yf-status yf-status--danger">Critical</span></td></tr>
+      <tr><td>MFA not enforced</td><td class="yf-mono">okta/contractors</td><td class="yf-num">9</td><td><span class="yf-status yf-status--warning">Warning</span></td></tr>
+      <tr aria-selected="true"><td>TLS 1.0 disabled</td><td class="yf-mono">api.example.com</td><td class="yf-num">31</td><td><span class="yf-status yf-status--success">Passed</span></td></tr>
+      <tr><td>Key older than 90 days</td><td class="yf-mono">gh/deploy-bot</td><td class="yf-num">100</td><td><span class="yf-status yf-status--neutral">Ignored</span></td></tr>
+      <tr><td>Open security group</td><td class="yf-mono">sg-0a91c3</td><td class="yf-num">5</td><td><span class="yf-status yf-status--danger">Critical</span></td></tr>
+      <tr><td>Unused IAM role</td><td class="yf-mono">role/legacy-etl</td><td class="yf-num">240</td><td><span class="yf-status yf-status--warning">Warning</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<!--/example-->
+  <p>A selected row is <code>aria-selected="true"</code> (or <code>.is-selected</code>). <code>.yf-table--sticky</code> keeps the header in view in a scrolling wrap (<code>--yf-table-max-h</code> sets the height). Sort by something other than the text with <code>data-sort-value</code>. An empty table shows one row:</p>
+<!--example html-->
+<div class="yf-table-wrap">
+  <table class="yf-table">
+    <thead><tr><th scope="col">Check</th><th scope="col">Asset</th><th scope="col">Status</th></tr></thead>
+    <tbody><tr class="yf-table__empty"><td colspan="3">No findings match this filter.</td></tr></tbody>
+  </table>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">status</h4>
+  <p>A pill with a dot and always a text label. The plain pill is neutral: an outline with a hollow dot. An icon as the first child replaces the dot.</p>
+<!--example html-->
+<div class="yf-cluster">
+  <span class="yf-status yf-status--danger">Critical</span>
+  <span class="yf-status yf-status--warning">Warning</span>
+  <span class="yf-status yf-status--success">Passed</span>
+  <span class="yf-status yf-status--neutral">Ignored</span>
+  <span class="yf-status">Default</span>
+  <span class="yf-status yf-status--danger"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#warning-circle"/></svg>Critical</span>
+  <span class="yf-status yf-status--success"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#check-circle"/></svg>Passed</span>
+  <span class="yf-status yf-status--neutral"><svg class="yf-icon" aria-hidden="true"><use href="{{SPRITE}}#clock"/></svg>Queued</span>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">stats and sparklines</h4>
+  <p>A row of stats with 1px rules between them, wrapping with the rules intact. On a phone the row stays one line and scrolls sideways, so a last stat is never left alone on its line. The delta text carries the meaning; the arrow and the colour are extra. A sparkline draws from its attribute: <code>data-yf-threshold="&gt;40"</code> turns the last point danger above 40 and draws a dashed limit, and <code>"&lt;95"</code> does the same below 95. Without <code>yf.js</code> the host stays empty, so keep the number in the stat.</p>
+<!--example html-->
+<dl class="yf-stats-row">
+  <div class="yf-stat">
+    <dt class="yf-stat__label">Open findings</dt>
+    <dd class="yf-stat__value">42</dd>
+    <dd class="yf-stat__delta yf-stat__delta--up yf-stat__delta--danger">+6 since Monday</dd>
+    <dd><span class="yf-sparkline" data-yf-sparkline="30,32,31,35,34,38,42" data-yf-threshold=">40"></span></dd>
+  </div>
+  <div class="yf-stat">
+    <dt class="yf-stat__label">Critical</dt>
+    <dd class="yf-stat__value">3</dd>
+    <dd class="yf-stat__delta yf-stat__delta--down yf-stat__delta--success">1 fewer than last week</dd>
+    <dd><span class="yf-sparkline" data-yf-sparkline="5,5,4,4,4,3,3"></span></dd>
+  </div>
+  <div class="yf-stat">
+    <dt class="yf-stat__label">Coverage</dt>
+    <dd class="yf-stat__value">94.2<span class="yf-stat__unit">%</span></dd>
+    <dd class="yf-stat__delta yf-stat__delta--down yf-stat__delta--warning">-1.3 points, below target</dd>
+    <dd><span class="yf-sparkline" data-yf-sparkline="97,96.5,96,95.5,95.1,94.8,94.2" data-yf-threshold="<95"></span></dd>
+  </div>
+  <div class="yf-stat">
+    <dt class="yf-stat__label">Median time to fix</dt>
+    <dd class="yf-stat__value">3.4<span class="yf-stat__unit">days</span></dd>
+    <dd class="yf-stat__delta yf-stat__delta--down">-0.6 days</dd>
+  </div>
+</dl>
+<!--/example-->
+  <h4 class="yf-eyebrow">key-value</h4>
+  <p>One value per key. It stacks under 36rem; <code>.yf-kv--stack</code> stacks it at any width, for a narrow side panel.</p>
+<!--example html-->
+<dl class="yf-kv">
+  <div><dt>Asset</dt><dd class="yf-mono">s3://billing-exports</dd></div>
+  <div><dt>Region</dt><dd>eu-west-1 (Ireland)</dd></div>
+  <div><dt>Status</dt><dd><span class="yf-status yf-status--danger">Critical</span></dd></div>
+  <div><dt>First seen</dt><dd><time datetime="2026-07-09">9 Jul 2026</time>, 112 days ago</dd></div>
+  <div><dt>Fingerprint</dt><dd class="yf-mono">sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</dd></div>
+</dl>
+<!--/example-->
+  <h4 class="yf-eyebrow">progress and meter</h4>
+  <p>Native elements. Progress is an ink bar on a rule track; leave out <code>value</code> for indeterminate. A meter maps its <code>low</code>, <code>high</code> and <code>optimum</code> to the status colours, so show the number beside it. The healthy range stays ink; only low and high take a status colour.</p>
+<!--example html-->
+<div class="yf-grid">
+  <div class="yf-stack">
+    <progress class="yf-progress" value="40" max="100" aria-label="Scan progress, 40 percent"></progress>
+    <progress class="yf-progress" aria-label="Working"></progress>
+  </div>
+  <div class="yf-stack">
+    <meter class="yf-meter" min="0" max="100" low="60" high="85" optimum="0" value="30" aria-label="Disk, 30 percent"></meter>
+    <meter class="yf-meter" min="0" max="100" low="60" high="85" optimum="0" value="72" aria-label="Disk, 72 percent"></meter>
+    <meter class="yf-meter" min="0" max="100" low="60" high="85" optimum="0" value="94" aria-label="Disk, 94 percent"></meter>
+  </div>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">code</h4>
+  <p>The block this page uses for its snippets. <code>data-yf-copy</code> copies the nearest block; <code>data-yf-copy="#id"</code> copies that element (an input's value, else its text). The label changes to the word in <code>data-yf-copied</code> for a moment. Where the clipboard is unavailable it selects the text and says "Selected". Without a head, put the button straight inside <code>.yf-code</code> and it floats top right. Give a scrolling <code>pre</code> <code>tabindex="0"</code>.</p>
+<!--example html-->
+<div class="yf-grid yf-grid--lg">
+  <div class="yf-code">
+    <div class="yf-code__head">
+      <span class="yf-code__file">deploy.sh</span>
+      <button class="yf-code__copy" type="button" data-yf-copy>
+        <svg class="yf-icon yf-icon--sm" aria-hidden="true"><use href="{{SPRITE}}#copy"/></svg>
+        <span data-yf-copy-label>Copy</span>
+      </button>
+    </div>
+<pre tabindex="0"><code>#!/bin/sh
+set -eu
+aws s3 sync ./dist s3://example/v0.1.0/
+echo "deployed v0.1.0"</code></pre>
+  </div>
+  <div class="yf-code">
+    <button class="yf-code__copy" type="button" data-yf-copy aria-label="Copy code">
+      <svg class="yf-icon yf-icon--sm" aria-hidden="true"><use href="{{SPRITE}}#copy"/></svg>
+    </button>
+<pre tabindex="0"><code>curl -s https://api.example.com/v1/findings \
+  -H "Authorization: Bearer $TOKEN"</code></pre>
+  </div>
+</div>
+<!--/example-->
+</section>
+
+<!-- ---------------- charts ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="charts">Charts<a class="yf-anchor" href="#charts" aria-label="Link to this section"></a></h3>
+  <p>Series are ink shades, and each shade has a dash pattern, so a chart reads in grey, in print and for colour-blind readers. Never rely on the shade alone, and never use colour for a series. Status colour marks a threshold only: a dashed danger line is a limit and nothing else, and a bar over it is labelled with its number.</p>
+<!--include series-->
+  <p class="yf-muted yf-text-sm">Every shade stays above 3:1 against paper in both themes. The shades sit close together on purpose, so the dash tells series apart and a direct label or a legend key names them.</p>
+  <p>Charts are hand-made or script-made SVG. <code>.yf-chart</code> sets the type; <code>.yf-chart-grid</code> and <code>.yf-chart-axis</code> draw the frame; <code>.yf-series-1</code> to <code>-4</code> give a line its shade and dash and a shape its fill; <code>.yf-chart-threshold</code> draws a limit. Set <code>stroke-width</code> as an attribute. Give every chart a text alternative: an <code>aria-label</code> that says what it shows, and the numbers somewhere a reader can reach.</p>
+<!--example html-->
+<div class="yf-grid">
+  <figure>
+    <figcaption class="yf-stat__label">Open findings by environment</figcaption>
+    <svg class="yf-chart" viewBox="0 0 340 150" role="img" aria-label="Line chart: open findings by environment over twelve months. Prod rises from 12 to 47 and crosses the limit of 40 in October.">
+      <line class="yf-chart-grid" x1="22" x2="340" y1="128" y2="128"/>
+      <text x="0" y="131">0</text>
+      <line class="yf-chart-grid" x1="22" x2="340" y1="75" y2="75"/>
+      <text x="0" y="78">25</text>
+      <line class="yf-chart-grid" x1="22" x2="340" y1="22" y2="22"/>
+      <text x="0" y="25">50</text>
+      <text x="22" y="144">jan</text>
+      <text x="107.6" y="144">apr</text>
+      <text x="193.3" y="144">jul</text>
+      <text x="278.9" y="144">oct</text>
+      <line class="yf-chart-threshold" x1="22" x2="340" y1="43.2" y2="43.2"/>
+      <text class="yf-chart-threshold" x="24" y="39.2">limit 40</text>
+      <polyline class="yf-series-4" stroke-width="1.75" points="22,123.8 50.5,121.6 79.1,121.6 107.6,119.5 136.2,121.6 164.7,117.4 193.3,115.3 221.8,117.4 250.4,113.2 278.9,115.3 307.5,111 336,108.9"/>
+      <polyline class="yf-series-3" stroke-width="1.75" points="22,119.5 50.5,115.3 79.1,117.4 107.6,108.9 136.2,111 164.7,104.7 193.3,100.4 221.8,102.6 250.4,98.3 278.9,100.4 307.5,92 336,87.7"/>
+      <polyline class="yf-series-2" stroke-width="1.75" points="22,111 50.5,106.8 79.1,98.3 107.6,102.6 136.2,94.1 164.7,87.7 193.3,89.8 221.8,81.4 250.4,83.5 278.9,75 307.5,70.8 336,72.9"/>
+      <polyline class="yf-series-1" stroke-width="2.25" points="22,102.6 50.5,89.8 79.1,96.2 107.6,81.4 136.2,64.4 164.7,72.9 193.3,55.9 221.8,62.3 250.4,47.4 278.9,39 307.5,43.2 336,28.4"/>
+      <circle class="yf-series-1" cx="336" cy="28.4" r="3"/>
+      <text class="yf-chart-label" x="292" y="20.4">prod 47</text>
+    </svg>
+    <ul class="yf-legend">
+      <li><svg class="yf-legend__key" viewBox="0 0 24 8" aria-hidden="true"><line class="yf-series-1" x1="0" y1="4" x2="24" y2="4"/></svg>prod</li>
+      <li><svg class="yf-legend__key" viewBox="0 0 24 8" aria-hidden="true"><line class="yf-series-2" x1="0" y1="4" x2="24" y2="4"/></svg>staging</li>
+      <li><svg class="yf-legend__key" viewBox="0 0 24 8" aria-hidden="true"><line class="yf-series-3" x1="0" y1="4" x2="24" y2="4"/></svg>dev</li>
+      <li><svg class="yf-legend__key" viewBox="0 0 24 8" aria-hidden="true"><line class="yf-series-4" x1="0" y1="4" x2="24" y2="4"/></svg>sandbox</li>
+      <li><svg class="yf-legend__key" viewBox="0 0 24 8" aria-hidden="true"><line class="yf-chart-threshold" x1="0" y1="4" x2="24" y2="4"/></svg>limit</li>
+    </ul>
+  </figure>
+  <figure>
+    <figcaption class="yf-stat__label">Days to fix, last 7 criticals</figcaption>
+    <svg class="yf-chart" viewBox="0 0 340 150" role="img" aria-label="Bar chart: days to fix the last seven critical findings. Two took longer than the limit of 7 days: 8 and 11.">
+      <rect class="yf-series-1" x="22" y="101.5" width="30" height="26.5"/>
+      <rect class="yf-series-1" x="66" y="83.8" width="30" height="44.2"/>
+      <rect class="yf-series-1" x="110" y="110.3" width="30" height="17.7"/>
+      <rect fill="var(--yf-danger)" x="154" y="57.3" width="30" height="70.7"/>
+      <rect class="yf-series-1" x="198" y="92.7" width="30" height="35.3"/>
+      <rect fill="var(--yf-danger)" x="242" y="30.8" width="30" height="97.2"/>
+      <rect class="yf-series-1" x="286" y="75" width="30" height="53"/>
+      <line class="yf-chart-axis" x1="22" x2="330" y1="128" y2="128"/>
+      <line class="yf-chart-threshold" x1="22" x2="330" y1="66.2" y2="66.2"/>
+      <text class="yf-chart-threshold" x="24" y="62.2">limit 7 days</text>
+      <text class="yf-chart-label" x="165" y="53.3">8</text>
+      <text class="yf-chart-label" x="253" y="26.8">11</text>
+    </svg>
+  </figure>
+</div>
+<!--/example-->
+  <p>The legend reuses the series classes on a short line, so its keys carry the same dash. A shape over its limit takes <code>fill="var(--yf-danger)"</code> in place of a series class, and its value is printed above it.</p>
+  <h4 class="yf-eyebrow">yf.chart</h4>
+  <p><code>yf.chart</code> draws a line or bar chart from a spec, at the width it is shown. It chooses round tick numbers, thins the x labels to fit, moves the end labels of a line apart so none overlap, writes the <code>aria-label</code> from your data, and redraws when its box changes size, so the text stays 10px at any width. Put the spec in a JSON block inside a block element, and set <code>data-yf-chart</code> to <code>line</code> or <code>bar</code>:</p>
+<!--example html-->
+<div class="yf-grid">
+  <figure data-yf-chart="line">
+    <figcaption class="yf-stat__label">Open findings by environment</figcaption>
+    <script type="application/json">
+    {
+      "title": "open findings by environment, last six weeks",
+      "labels": ["1 Sep", "8 Sep", "15 Sep", "22 Sep", "29 Sep", "6 Oct"],
+      "series": [
+        { "name": "prod", "values": [22, 25, 31, 36, 41, 47] },
+        { "name": "staging", "values": [30, 28, 29, 33, 35, 34] },
+        { "name": "dev", "values": [18, 20, 19, 24, 22, 26] }
+      ],
+      "thresholds": [{ "value": 40, "label": "limit 40" }],
+      "legend": true
+    }
+    </script>
+  </figure>
+  <figure data-yf-chart="bar">
+    <figcaption class="yf-stat__label">Open criticals by team</figcaption>
+    <script type="application/json">
+    {
+      "title": "open critical findings by team",
+      "bars": [
+        { "label": "platform", "value": 2 },
+        { "label": "payments", "value": 4 },
+        { "label": "identity", "value": 3 },
+        { "label": "data", "value": 7 },
+        { "label": "web", "value": 1 }
+      ],
+      "values": true,
+      "thresholds": [{ "value": 5, "label": "limit 5" }]
+    }
+    </script>
+  </figure>
+</div>
+<!--/example-->
+  <p>The chart is drawn where the script block sits; the caption and anything else in the figure are yours. A bar past a threshold turns danger and always prints its number, as in the hand-made chart above. A chart that is hidden when the page loads, in a closed <code>&lt;details&gt;</code> or an inactive tab, draws when it gets a width. With no data it draws an empty frame.</p>
+  <p>From script, call <code>yf.chart.line(el, spec)</code> or <code>yf.chart.bar(el, spec)</code>. Each returns <code>{ update(spec), destroy() }</code>. <code>update</code> merges the keys you pass into the spec and redraws.</p>
+<!--code js-->
+const chart = yf.chart.line(document.getElementById('trend'), {
+  title: 'open findings by severity',
+  labels: ['3 Aug', '10 Aug', '17 Aug'],
+  series: [
+    { name: 'Critical', values: [12, 9, 7] },
+    { name: 'High', values: [30, 31, 24] },
+  ],
+  thresholds: [{ value: 10, label: 'target 10' }],
+});
+
+chart.update({ series: newSeries }); // merge into the spec, redraw
+chart.destroy(); // stop watching, remove the svg
+<!--/code-->
+  <div class="yf-table-wrap" tabindex="0" role="region" aria-label="Chart spec">
+    <table class="yf-table">
+      <thead><tr><th scope="col">key</th><th scope="col">on</th><th scope="col">what it does</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><code>labels</code></th><td>line</td><td>One x label per point. They thin out to fit, and the last one stays.</td></tr>
+        <tr><th scope="row"><code>series</code></th><td>line</td><td>Up to four <code>{ name, values }</code>, drawn as <code>.yf-series-1</code> to <code>-4</code>. A value that is not a number leaves a gap.</td></tr>
+        <tr><th scope="row"><code>bars</code></th><td>bar</td><td><code>{ label, value, note }</code> for each bar. A <code>null</code> value reads "none"; a note is a second line under the label.</td></tr>
+        <tr><th scope="row"><code>values</code></th><td>bar</td><td><code>true</code> prints every bar's value.</td></tr>
+        <tr><th scope="row"><code>thresholds</code></th><td>both</td><td><code>{ value, label, below }</code> for each limit. A bar above it turns danger, or below it with <code>below: true</code>.</td></tr>
+        <tr><th scope="row"><code>title</code>, <code>label</code></th><td>both</td><td><code>title</code> says what the chart shows and starts the <code>aria-label</code>. It is not drawn. <code>label</code> replaces the whole <code>aria-label</code>.</td></tr>
+        <tr><th scope="row"><code>legend</code></th><td>both</td><td><code>true</code> draws a <code>.yf-legend</code> under the chart: each series with its shade and dash, then each threshold by its label. A bar chart's legend lists its thresholds.</td></tr>
+        <tr><th scope="row"><code>min</code>, <code>max</code>, <code>decimals</code></th><td>both</td><td>The value range (default: zero up to the next round number past the data) and the decimals in value labels.</td></tr>
+        <tr><th scope="row"><code>height</code>, <code>margin</code></th><td>both</td><td>Pixels. <code>margin</code> is <code>{ top, right, bottom, left }</code>; the defaults leave room for the tick labels and the end labels.</td></tr>
+        <tr><th scope="row"><code>empty</code>, <code>none</code></th><td>both</td><td>The text for a chart with no data ("No data") and for a bar with no value ("none").</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ---------------- content ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="content">Content<a class="yf-anchor" href="#content" aria-label="Link to this section"></a></h3>
+  <p><code>.yf-prose</code> is the reading column from yoanfaure.com: 38rem, about 68 characters of Inter, with spacing for headings, lists, quotes, tables and figures. Use it for long text, not for app chrome. The headings in these examples are demo content; the h1 of a real page is yours.</p>
+  <h4 class="yf-eyebrow">prose</h4>
+<!--example html-->
+<article class="yf-prose">
+  <ul class="yf-meta"><li>essay</li><li><time datetime="2026-10-12">12 Oct 2026</time></li><li><a href="#content">a1b2c3d</a></li></ul>
+  <p>Controls are the only round things. A button has a <code>3px</code> corner; a page, a table and a card have none.<sup><a href="#fn-radius" id="ref-radius">1</a></sup></p>
+  <h3>Ink on paper<a class="yf-anchor" href="#content" aria-label="Link to this section"></a></h3>
+  <p>Everything is ink on paper, with <strong>one weight of emphasis</strong> and a muted grey for the small stuff.</p>
+  <ul>
+    <li>Nothing is coloured to look nice.</li>
+    <li>A list item can run long enough to wrap onto a second line, which shows the hanging indent.
+      <ul><li>Nested items get a smaller gap.</li></ul>
+    </li>
+  </ul>
+  <blockquote><p>A plain quote keeps the rule and the italics. It is the quiet one.</p></blockquote>
+  <table>
+    <thead><tr><th>Layer</th><th>Holds</th></tr></thead>
+    <tbody>
+      <tr><td>yf.reset</td><td>the reset</td></tr>
+      <tr><td>yf.components</td><td>buttons, tables, states</td></tr>
+    </tbody>
+  </table>
+  <section class="yf-footnotes">
+    <ol><li id="fn-radius"><p>The 3px is a token, <code>--yf-radius</code>. <a class="yf-footnote-back" href="#ref-radius" aria-label="Back to the text">&#8617;</a></p></li></ol>
+  </section>
+</article>
+<!--/example-->
+  <p><code>.yf-meta</code> is the meta line (a list or a paragraph). <code>.yf-anchor</code> is a heading permalink, hidden until the heading is hovered or the link is focused; it stays reachable by keyboard.</p>
+  <h4 class="yf-eyebrow">log</h4>
+  <p>The git-log list from the home of yoanfaure.com: hash, date, type, title, in columns that hold when a title wraps. <code>.yf-log--lg</code> is the home size.</p>
+<!--example html-->
+<ol class="yf-log">
+  <li class="yf-log__row"><a class="yf-log__hash" href="#content">a1b2c3d</a> <time class="yf-log__date" datetime="2026-10-12">2026-10-12</time> <span class="yf-log__type">essay</span> <a class="yf-log__title" href="#content">Why the layout is square</a></li>
+  <li class="yf-log__row"><a class="yf-log__hash" href="#content">e4f5a6b</a> <time class="yf-log__date" datetime="2026-09-30">2026-09-30</time> <span class="yf-log__type">note</span> <a class="yf-log__title" href="#content">Tabular numbers in a dense table</a></li>
+  <li class="yf-log__row"><span class="yf-log__hash">c7d8e9f</span> <time class="yf-log__date" datetime="2026-09-02">2026-09-02</time> <span class="yf-log__type">project</span> <a class="yf-log__title" href="#content">A very long title that wraps onto a second line to show how the grid keeps the columns where they are</a></li>
+</ol>
+<!--/example-->
+  <h4 class="yf-eyebrow">list</h4>
+  <p>Rows of things to pick: prompts, reports, runbooks. Every part but the title is optional. A linked title makes the whole row its hit area, and links or buttons in the meta stay clickable above it. In under 52rem of its own width a row is the title with the rest beneath it; wider, the sentence sits beside the title.</p>
+<!--example html-->
+<ol class="yf-list">
+  <li class="yf-list__item">
+    <span class="yf-list__num">01</span>
+    <a class="yf-list__title" href="#content">Assess the program you inherited</a>
+    <p class="yf-list__text">Turn what exists today into a first 90-day plan, with the assumptions behind it.</p>
+    <div class="yf-list__meta"><span class="yf-status">first 90 days</span></div>
+  </li>
+  <li class="yf-list__item">
+    <span class="yf-list__num">02</span>
+    <a class="yf-list__title" href="#content">Threat model a new service</a>
+    <p class="yf-list__text">A STRIDE pass over a design doc, ranked by what an attacker would try first.</p>
+    <div class="yf-list__meta"><span class="yf-status">threat modeling</span><span class="yf-status">appsec</span></div>
+  </li>
+  <li class="yf-list__item">
+    <span class="yf-list__num">03</span>
+    <a class="yf-list__title" href="#content">Review an OAuth app's scopes</a>
+    <p class="yf-list__text">Decide whether a third-party app needs the access it asks for.</p>
+    <div class="yf-list__meta"><span class="yf-status">vendors</span></div>
+  </li>
+</ol>
+<!--/example-->
+  <h4 class="yf-eyebrow">disclosure</h4>
+<!--example html-->
+<div>
+  <details class="yf-disclosure">
+    <summary>What the prompt assumes</summary>
+    <div class="yf-disclosure__body"><p>That you can read the cloud console, and that nobody has written a policy yet.</p></div>
+  </details>
+  <details class="yf-disclosure" open>
+    <summary>What you get back</summary>
+    <div class="yf-disclosure__body"><p>A ranked list of risks, each with the evidence you would need to close it.</p></div>
+  </details>
+</div>
+<!--/example-->
+  <p>A native <code>&lt;details&gt;</code>: it opens and closes with no script, by mouse and keyboard. Disclosures in a row share their rules.</p>
+  <h4 class="yf-eyebrow">callout, quote, figure</h4>
+<!--example html-->
+<div class="yf-stack yf-stack--lg">
+  <dl class="yf-stats-callout">
+    <div><dt>42</dt><dd>findings closed</dd></div>
+    <div><dt>3.4d</dt><dd>median time to fix</dd></div>
+    <div><dt>99.9%</dt><dd>scan uptime</dd></div>
+  </dl>
+  <figure class="yf-quote">
+    <blockquote><p>Make the quiet part of the interface do the work.</p></blockquote>
+    <figcaption>Yoan Faure, <cite>Notes on ink</cite></figcaption>
+  </figure>
+  <figure class="yf-figure yf-figure--framed">
+    <svg viewBox="0 0 400 120" width="400" height="120" role="img" aria-label="A line that climbs from left to right"><path class="yf-series-1" fill="none" stroke-width="2" d="M10 100 L80 70 L150 80 L230 30 L320 50 L390 15"/></svg>
+    <figcaption>Figure 1. A caption is one muted sentence under the picture.</figcaption>
+  </figure>
+</div>
+<!--/example-->
+</section>
+
+<!-- ---------------- states ---------------- -->
+<section class="docs-topic yf-stack yf-stack--lg">
+  <h3 id="states">States<a class="yf-anchor" href="#states" aria-label="Link to this section"></a></h3>
+  <p>The topo field, the ASCII contours from yoanfaure.com, appears in an app in three places only: empty states, loading states, and error pages. It is a watermark; text over it gets a halo of the page colour. The headline of an empty state invites; it never apologises. The field draws only while its box is on screen, pauses when the tab is hidden, shows one still frame under reduced motion, and a pointer over the box raises a gentle hill. <code>yf.js</code> is what draws it; without the script the box is empty and the text still reads.</p>
+  <h4 class="yf-eyebrow">empty</h4>
+<!--example html-->
+<section class="yf-empty">
+  <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+  <div class="yf-empty__body">
+    <h4 class="yf-empty__title">Run your first scan</h4>
+    <p class="yf-empty__text">Findings from the last run will show up here, newest first.</p>
+    <div class="yf-empty__action">
+      <button class="yf-button yf-button--primary" type="button">Run scan</button>
+      <button class="yf-button" type="button">Import findings</button>
+    </div>
+  </div>
+</section>
+<!--/example-->
+  <p><code>.yf-empty--framed</code> adds a hairline box. <code>data-yf-seed="7"</code> gives the same landscape every time, and <code>data-yf-static</code> draws one still frame.</p>
+<!--example html-->
+<section class="yf-empty yf-empty--framed">
+  <div class="yf-topo" data-yf-field data-yf-seed="7" data-yf-static aria-hidden="true"></div>
+  <div class="yf-empty__body">
+    <h4 class="yf-empty__title">Nothing to review</h4>
+    <p class="yf-empty__text">New findings will land here.</p>
+  </div>
+</section>
+<!--/example-->
+  <h4 class="yf-eyebrow">loading</h4>
+  <p>Set <code>aria-busy="false"</code>, or remove the element, when the content arrives.</p>
+<!--example html-->
+<div class="yf-loading" role="status" aria-busy="true">
+  <div class="yf-topo" data-yf-field aria-hidden="true"></div>
+  <p class="yf-loading__label">Loading findings</p>
+</div>
+<!--/example-->
+  <h4 class="yf-eyebrow">error page</h4>
+  <p>Like the 404 of yoanfaure.com: a shell line, then a prompt that goes home. The <code>h1</code> is for screen readers and the outline; the terminal is what you see. See this site's own at <a href="/404">/404</a>.</p>
+<!--code html-->
+<main class="yf-error-page">
+  <div class="yf-topo yf-topo--fixed" data-yf-field aria-hidden="true"></div>
+  <div class="yf-error-page__body">
+    <h1 class="yf-error-page__title">Page not found</h1>
+    <pre class="yf-terminal">zsh: no such file or directory: /nope</pre>
+    <pre class="yf-terminal yf-terminal--prompt"><a href="/">cd ~</a></pre>
+  </div>
+</main>
+<!--/code-->
+</section>
+</section>
+
+</main>
+</div>
+
+<footer class="docs-footer">
+  <div class="yf-container yf-cluster yf-cluster--between">
+    <p class="yf-muted yf-text-sm">yf {{VERSION_SHOWN}}. MIT. Inter and JetBrains Mono are OFL 1.1; icons are Phosphor, MIT.</p>
+    <p class="yf-text-sm"><a href="#top">Back to top</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

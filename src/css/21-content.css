@@ -1,0 +1,654 @@
+/* Content: ported from yoanfaure.com (assets/css/site.css): prose, the git-log list, the
+   meta line, stat callouts, pull quote and figure. The look is the site's; the values
+   are yf tokens. Sizes that the site sets in rem stay in rem, so a block looks the
+   same wherever it sits. */
+
+@layer yf.components {
+  /* ---------- prose: the reading column ----------
+     <article class="yf-prose"> headings, paragraphs, lists, quotes, tables, figures </article>
+     38rem is about 68 characters of Inter at this size. Inline code is base's; pre is
+     styled here. Headings h2 to h4 are spaced here; the h1 is the page's. */
+
+  .yf-prose {
+    max-width: var(--yf-measure);
+    font-size: var(--yf-text-lg);
+    line-height: var(--yf-leading-prose);
+  }
+
+  .yf-prose :is(p, ul, ol, pre, table, blockquote, figure) {
+    margin: 0 0 1.35em;
+  }
+
+  .yf-prose h2 {
+    margin: 2.75rem 0 0.8rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .yf-prose h3 {
+    margin: 2.25rem 0 0.6rem;
+    font-size: 1.2rem;
+    line-height: 1.35;
+  }
+
+  .yf-prose h4 {
+    margin: 1.75rem 0 0.5rem;
+    font-size: var(--yf-text-lg);
+    line-height: 1.4;
+  }
+
+  .yf-prose > :first-child {
+    margin-top: 0;
+  }
+
+  /* the stack around it owns the space below */
+  .yf-prose > :last-child {
+    margin-bottom: 0;
+  }
+
+  .yf-prose ul,
+  .yf-prose ol {
+    padding-left: 1.4em;
+  }
+
+  .yf-prose li + li {
+    margin-top: 0.4em;
+  }
+
+  .yf-prose li > :is(ul, ol) {
+    margin: 0.4em 0 0;
+  }
+
+  .yf-prose strong {
+    font-weight: 650;
+  }
+
+  .yf-prose img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .yf-prose hr {
+    margin: 2.75rem 0;
+    border: 0;
+    border-top: 1px solid var(--yf-rule);
+  }
+
+  /* code blocks: ruled, not filled (a filled, copyable block is .yf-code) */
+  .yf-prose pre {
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    border: 1px solid var(--yf-rule);
+    font-size: var(--yf-text-sm);
+    line-height: var(--yf-leading-normal);
+    tab-size: 2;
+  }
+
+  .yf-prose pre code {
+    padding: 0;
+    background: none;
+    font-size: inherit;
+  }
+
+  /* a plain quote: a rule in ink and italics. The loud one is .yf-quote. */
+  .yf-prose blockquote {
+    padding-left: 1.25em;
+    border-left: 2px solid var(--yf-fg);
+    font-style: italic;
+  }
+
+  .yf-prose blockquote > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* heading permalinks: <a class="yf-anchor" href="#id" aria-label="Link to this section"></a>.
+     Hidden by opacity, not visibility, so the keyboard can still reach them. */
+  .yf-anchor {
+    margin-left: 0.4em;
+    color: var(--yf-muted);
+    font-weight: var(--yf-weight-regular);
+    text-decoration: none;
+    opacity: 0;
+  }
+
+  .yf-anchor::before {
+    content: "#";
+  }
+
+  :is(h2, h3, h4):hover > .yf-anchor,
+  .yf-anchor:focus-visible {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .yf-anchor {
+      opacity: 1;
+    }
+  }
+
+  /* footnotes: <sup><a href="#fn1">1</a></sup>, then <section class="yf-footnotes"><ol>...</ol></section> */
+  .yf-prose sup {
+    line-height: 0;
+  }
+
+  .yf-prose sup a,
+  .yf-footnote-back {
+    text-decoration: none;
+  }
+
+  .yf-footnotes {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--yf-rule);
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-footnotes ol {
+    margin: 0;
+  }
+
+  .yf-footnotes p {
+    margin: 0 0 0.5rem;
+  }
+
+  /* tables in prose: ruled, no boxes. (A data table is .yf-table.) */
+  .yf-prose table:not(.yf-table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+  }
+
+  .yf-prose table:not(.yf-table) :is(th, td) {
+    padding: 0.7em 2ch 0.7em 0;
+    border-top: 1px solid var(--yf-rule);
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-prose table:not(.yf-table) :is(th, td):last-child {
+    padding-right: 0;
+  }
+
+  .yf-prose table:not(.yf-table) th {
+    border-top: 0;
+    border-bottom: 1px solid var(--yf-fg);
+    color: var(--yf-muted);
+    font-weight: 650;
+  }
+
+  .yf-prose table:not(.yf-table) tbody tr:last-child td {
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-prose table:not(.yf-table) td:first-child {
+    color: var(--yf-muted);
+  }
+
+  /* ---------- meta line ----------
+     <p class="yf-meta">essay · <time datetime="2026-10-12">12 Oct 2026</time> · <a href="..">a1b2c3d</a></p>
+     or, with the separators drawn by CSS (they stay out of the links):
+     <ul class="yf-meta"><li>essay</li><li><time>..</time></li><li><a>..</a></li></ul>
+     No outer margin: the stack it sits in spaces it (inside .yf-prose it keeps 1rem). In the
+     list form a wrapped line never starts with a dot. */
+
+  .yf-meta {
+    margin: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+
+  .yf-prose .yf-meta {
+    margin: 0 0 1rem;
+  }
+
+  /* Every item draws its dot in the gap before it. The first item of each line has its
+     dot outside the list's start edge, where the clip hides it. The clip keeps room above,
+     below and after for focus rings. */
+  ul.yf-meta,
+  ol.yf-meta {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1em;
+    padding: 0;
+    list-style: none;
+    clip-path: inset(-1em -1em -1em 0);
+  }
+
+  ul.yf-meta:dir(rtl),
+  ol.yf-meta:dir(rtl) {
+    clip-path: inset(-1em 0 -1em -1em);
+  }
+
+  .yf-meta > li + li {
+    margin-top: 0; /* beats the prose list rhythm */
+  }
+
+  .yf-meta > li::before {
+    content: "\00b7";
+    display: inline-block;
+    inline-size: 1em;
+    margin-inline-start: -1em;
+    text-align: center;
+  }
+
+  @supports (content: "x" / "") {
+    .yf-meta > li::before {
+      content: "\00b7" / "";
+    }
+  }
+
+  /* ---------- log: the git-log list ----------
+     <ol class="yf-log"><li class="yf-log__row">
+       <a class="yf-log__hash" href="..">a1b2c3d</a> <time class="yf-log__date">2026-10-12</time>
+       <span class="yf-log__type">essay</span> <a class="yf-log__title" href="..">Title</a>
+     </li></ol>
+     Hash and date are mono, sized by their own ch so they line up whatever the row's font
+     is. Type and title are Inter: the type gets a fixed track, the title the rest. Under
+     600px a row is two lines. .yf-log--lg is the home page's size. */
+
+  .yf-log {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--yf-rule);
+    list-style: none;
+  }
+
+  .yf-log__row {
+    display: grid;
+    grid-template-columns: max-content max-content 3.75em minmax(0, 1fr);
+    column-gap: 1.25em;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-log__hash,
+  .yf-log__date {
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: 0.8em;
+    font-variant-ligatures: none;
+  }
+
+  .yf-log__hash {
+    width: 7ch;
+  }
+
+  .yf-log__date {
+    width: 10ch;
+  }
+
+  .yf-log__hash:not([href]) {
+    text-decoration: none;
+  }
+
+  .yf-log__type {
+    color: var(--yf-muted);
+  }
+
+  .yf-log__title {
+    justify-self: start;
+    font-weight: var(--yf-weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  .yf-log--lg {
+    font-size: var(--yf-text-lg);
+  }
+
+  /* ---------- list: rows of things to pick ----------
+     <ol class="yf-list">
+       <li class="yf-list__item">
+         <span class="yf-list__num">01</span>
+         <a class="yf-list__title" href="#threat-model">Threat model a new service</a>
+         <p class="yf-list__text">One sentence on what it is for.</p>
+         <div class="yf-list__meta"><span class="yf-status">cloud</span></div>
+       </li>
+     </ol>
+     For prompts, reports, runbooks: the things a .yf-log cannot hold. Every part but the
+     title is optional. A linked title makes the whole row its hit area; links and buttons
+     in the meta stay clickable above it. Under 52rem of its own width a row is a title
+     with the rest beneath; wider, the sentence sits beside the title and the meta at the
+     end. */
+
+  .yf-list {
+    margin: 0;
+    padding: 0;
+    border-top: var(--yf-border);
+    list-style: none;
+    container-type: inline-size;
+  }
+
+  .yf-list__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--yf-space-1) var(--yf-space-3);
+    margin: 0;
+    padding: var(--yf-space-3) 0;
+    border-bottom: var(--yf-border);
+  }
+
+  .yf-list__item:has(> .yf-list__num) {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .yf-list__item > :not(.yf-list__num, .yf-list__title) {
+    grid-column: -2;
+  }
+
+  .yf-list__num {
+    color: var(--yf-muted);
+    font-family: var(--yf-font-mono);
+    font-size: var(--yf-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yf-list__title {
+    justify-self: start;
+    font-weight: var(--yf-weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  a.yf-list__title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .yf-list__text {
+    margin: 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-list__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--yf-space-2);
+    font-size: var(--yf-text-sm);
+  }
+
+  .yf-list__meta :is(a, button) {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (any-hover: hover) {
+    .yf-list__item:has(> a.yf-list__title):hover {
+      background: var(--yf-hover);
+    }
+
+    /* the row shows the hover; the title keeps its underline and does not invert */
+    .yf-list__item > a.yf-list__title:hover {
+      background: none;
+      color: inherit;
+    }
+  }
+
+  @container (min-width: 52rem) {
+    .yf-list__item {
+      grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr) auto;
+      column-gap: var(--yf-space-5);
+      align-items: baseline;
+    }
+
+    .yf-list__item:has(> .yf-list__num) {
+      grid-template-columns: 2rem minmax(12rem, 20rem) minmax(0, 1fr) auto;
+    }
+
+    .yf-list__item > :not(.yf-list__num, .yf-list__title) {
+      grid-column: auto;
+    }
+
+    .yf-list__item:not(:has(> .yf-list__text)) > .yf-list__meta {
+      grid-column: -2;
+    }
+
+    .yf-list__meta {
+      justify-content: flex-end;
+    }
+  }
+
+  /* ---------- disclosure ----------
+     <details class="yf-disclosure">
+       <summary>What the prompt assumes</summary>
+       <div class="yf-disclosure__body">...</div>
+     </details>
+     A ruled row with a chevron that turns when open. Disclosures in a row share their
+     rules. Opening eases the height where the browser can animate to auto. */
+
+  .yf-disclosure {
+    border-bottom: var(--yf-border);
+  }
+
+  :not(.yf-disclosure) + .yf-disclosure,
+  .yf-disclosure:first-child {
+    border-top: var(--yf-border);
+  }
+
+  .yf-disclosure > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--yf-space-3);
+    min-block-size: var(--yf-control-h);
+    padding: var(--yf-space-2) var(--yf-space-1);
+    font-weight: var(--yf-weight-medium);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .yf-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* the chevron: two borders of a small square, turned */
+  .yf-disclosure > summary::before {
+    content: "";
+    flex: none;
+    inline-size: 0.45em;
+    block-size: 0.45em;
+    margin-inline: 0.15em 0.1em;
+    border-block-start: 1.5px solid currentColor;
+    border-inline-end: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .yf-disclosure[open] > summary::before {
+    transform: rotate(135deg);
+  }
+
+  .yf-disclosure > summary:dir(rtl)::before {
+    transform: rotate(-45deg);
+  }
+
+  .yf-disclosure[open] > summary:dir(rtl)::before {
+    transform: rotate(-135deg);
+  }
+
+  @media (any-hover: hover) {
+    .yf-disclosure > summary:hover {
+      background: var(--yf-hover);
+    }
+  }
+
+  .yf-disclosure > summary:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .yf-disclosure__body {
+    padding: var(--yf-space-1) var(--yf-space-1) var(--yf-space-4) calc(var(--yf-space-1) + 0.7em + var(--yf-space-3));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .yf-disclosure > summary::before {
+      transition: transform var(--yf-dur) var(--yf-ease-out);
+    }
+
+    @supports selector(::details-content) {
+      .yf-disclosure {
+        interpolate-size: allow-keywords;
+      }
+
+      .yf-disclosure::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size var(--yf-dur) var(--yf-ease-out),
+          content-visibility var(--yf-dur) allow-discrete;
+      }
+
+      .yf-disclosure[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+
+  .yf-log--lg .yf-log__row {
+    padding: 0.95rem 0;
+  }
+
+  @media (max-width: 599.98px) {
+    .yf-log__row {
+      grid-template-columns: 4em minmax(0, 1fr);
+      column-gap: 1em;
+      padding: 0.7rem 0;
+    }
+
+    .yf-log__hash {
+      grid-area: 1 / 1;
+    }
+
+    .yf-log__date {
+      grid-area: 1 / 2;
+    }
+
+    .yf-log__type {
+      grid-area: 2 / 1;
+    }
+
+    .yf-log__title {
+      grid-area: 2 / 2;
+    }
+  }
+
+  /* ---------- stats callout ----------
+     <dl class="yf-stats-callout"><div><dt>42</dt><dd>findings closed</dd></div> ... </dl>
+     A big number over a small muted label, ruled like the tables: up to four columns in
+     a reading column, two on a phone. In rem, so it looks the same in prose and
+     elsewhere. (A dashboard row of stats is .yf-stats-row.) */
+
+  .yf-stats-callout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    margin: 2rem 0;
+    border-bottom: 1px solid var(--yf-rule);
+  }
+
+  .yf-stats-callout > div {
+    min-width: 0;
+    padding: 1.1rem 1rem 1.2rem 0;
+    border-top: 1px solid var(--yf-rule);
+  }
+
+  .yf-stats-callout dt {
+    font-size: clamp(2.25rem, 1.8rem + 1.6vw, 2.75rem);
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-display);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .yf-stats-callout dd {
+    margin: 0.55rem 0 0;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  /* on a phone (two columns) an odd last stat takes the whole row, so its rule is as long as the others */
+  @media (max-width: 27.5rem) {
+    .yf-stats-callout > div:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ---------- pull quote ----------
+     <figure class="yf-quote">
+       <blockquote><p>Make the quiet part of the interface do the work.</p></blockquote>
+       <figcaption>Yoan Faure, <cite>Notes on ink</cite></figcaption>
+     </figure>
+     Larger and bolder than the prose quote, upright, with the same ink rule. A bare
+     <blockquote class="yf-quote"> with a <footer> works too. */
+
+  .yf-quote {
+    margin: 2.25rem 0;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--yf-fg);
+  }
+
+  .yf-quote blockquote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .yf-quote p {
+    margin: 0;
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 1.75rem);
+    font-style: normal;
+    font-weight: var(--yf-weight-medium);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .yf-quote p + p {
+    margin-top: 0.6em;
+  }
+
+  .yf-quote :is(figcaption, footer) {
+    margin-top: 0.75rem;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-style: normal;
+    line-height: 1.5;
+  }
+
+  .yf-quote cite {
+    font-style: normal;
+  }
+
+  /* ---------- figure ----------
+     <figure class="yf-figure"><img ...><figcaption>Caption, one sentence.</figcaption></figure>
+     .yf-figure--framed puts a hairline around the picture (screenshots). */
+
+  .yf-figure,
+  .yf-prose figure {
+    margin: 2rem 0;
+  }
+
+  .yf-figure > :is(img, svg, picture, video, canvas),
+  .yf-prose figure > :is(img, svg, picture, video, canvas) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .yf-figure--framed > :is(img, svg, picture, video, canvas) {
+    border: 1px solid var(--yf-rule);
+  }
+
+  .yf-figure figcaption,
+  .yf-prose figure figcaption {
+    margin-top: 0.6rem;
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    line-height: 1.5;
+  }
+}

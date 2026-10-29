@@ -1,0 +1,87 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # two commits, so HEAD^ is there for the immutability check
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Check the scripts parse
+        run: |
+          for f in scripts/build scripts/release scripts/serve; do
+            sh -n "$f"
+          done
+
+      # A release is a frozen folder that never changes. Any change under an
+      # already-released releases/vX.Y.Z/ (a file edited, added or deleted) fails the
+      # push. A folder that did not exist in the previous commit is a new release.
+      - name: Check released versions did not change
+        run: |
+          set -eu
+          if ! git rev-parse --verify --quiet 'HEAD^' > /dev/null; then
+            echo "First commit: nothing to compare."
+            exit 0
+          fi
+          touched=$(git diff --name-only --no-renames HEAD^ HEAD -- releases/ | sed -n 's|^releases/\(v[^/]*\)/.*|\1|p' | sort -u)
+          bad=0
+          for v in $touched; do
+            if git cat-file -e "HEAD^:releases/$v" 2> /dev/null; then
+              echo "::error title=A released version changed::releases/$v was released before and cannot change. Ship a new version instead."
+              git diff --name-status --no-renames HEAD^ HEAD -- "releases/$v"
+              bad=1
+            fi
+          done
+          exit "$bad"
+
+      # Fails if releases/ holds no release: the site always ships a frozen version.
+      - name: Build the site
+        run: scripts/build --production
+
+      - name: Upload the site
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: dist/site
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the site
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: dist/site
+
+      - name: Deploy the site to Cloudflare Workers
+        uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+          wranglerVersion: "4.155.0"

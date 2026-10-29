@@ -1,0 +1,189 @@
+/* Base: the page, links, focus, selection, headings, code. Same voice as
+   yoanfaure.com: Inter on paper, links underlined and inverted on hover. */
+
+@layer yf.base {
+  html {
+    /* paper on the root too, so a view transition never starts from the browser's white */
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    font-size: 100%; /* 16px, unless the reader chose another size */
+    tab-size: 2;
+  }
+
+  body {
+    background: var(--yf-bg);
+    color: var(--yf-fg);
+    font-family: var(--yf-font-sans);
+    font-size: var(--yf-text-base);
+    font-weight: var(--yf-weight-regular);
+    line-height: var(--yf-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  /* ---------- links ---------- */
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  a:not([href]) {
+    text-decoration: none;
+  }
+
+  a[href]:focus-visible {
+    background: var(--yf-fg);
+    color: var(--yf-bg);
+  }
+
+  @media (any-hover: hover) {
+    a[href]:hover {
+      background: var(--yf-fg);
+      color: var(--yf-bg);
+    }
+  }
+
+  /* ---------- focus ---------- */
+
+  :focus-visible {
+    outline: 2px solid var(--yf-focus);
+    outline-offset: 2px;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  /* ---------- headings ---------- */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--yf-weight-bold);
+    letter-spacing: var(--yf-tracking-tight);
+    line-height: var(--yf-leading-tight);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--yf-text-3xl);
+    letter-spacing: var(--yf-tracking-display);
+  }
+
+  h2 {
+    font-size: var(--yf-text-2xl);
+  }
+
+  h3 {
+    font-size: var(--yf-text-xl);
+  }
+
+  h4 {
+    font-size: var(--yf-text-lg);
+  }
+
+  h5 {
+    font-size: var(--yf-text-base);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  h6 {
+    color: var(--yf-muted);
+    font-size: var(--yf-text-sm);
+    font-weight: var(--yf-weight-medium);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  strong,
+  b {
+    font-weight: var(--yf-weight-medium);
+  }
+
+  small {
+    font-size: var(--yf-text-sm);
+  }
+
+  mark {
+    background: var(--yf-selected);
+    color: inherit;
+  }
+
+  /* ---------- code ---------- */
+
+  /* One weight of mono ships, so nothing is faked. */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--yf-font-mono);
+    font-weight: var(--yf-weight-regular);
+    font-style: normal;
+    font-synthesis-weight: none;
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0;
+  }
+
+  code,
+  kbd,
+  samp {
+    font-size: 0.875em;
+  }
+
+  :not(pre) > code {
+    padding: 0.12em 0.35em;
+    background: var(--yf-rule);
+  }
+
+  kbd {
+    padding: 0.1em 0.4em;
+    border: var(--yf-border);
+    border-radius: var(--yf-radius);
+    background: var(--yf-sunk);
+  }
+
+  pre {
+    padding: var(--yf-space-4) var(--yf-space-5);
+    overflow-x: auto;
+    border: var(--yf-border);
+    font-size: var(--yf-text-sm);
+    line-height: var(--yf-leading-normal);
+  }
+
+  /* ---------- rules ---------- */
+
+  hr {
+    block-size: 0;
+    border: 0;
+    border-block-start: var(--yf-border);
+    color: var(--yf-rule);
+  }
+
+  /* ---------- view transitions ---------- */
+
+  /* paper under every transition (the theme switch too), never the canvas white */
+  ::view-transition {
+    background: var(--yf-bg);
+  }
+
+  /* the theme switch is one soft cross-fade */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:active-view-transition-type(theme)::view-transition-group(*) {
+      animation-duration: var(--yf-dur);
+      animation-timing-function: var(--yf-ease-out);
+    }
+  }
+}
